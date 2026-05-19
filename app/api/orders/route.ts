@@ -1,16 +1,10 @@
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase-server";
 import { generateOrderNumber } from "@/lib/utils";
 
 export async function POST(request: Request) {
   try {
-    if (!supabase) {
-      return NextResponse.json(
-        { error: "Supabase is not configured" },
-        { status: 500 }
-      );
-    }
-
+    const supabase = createClient();
     const body = await request.json();
     const {
       customerName,
@@ -91,11 +85,12 @@ export async function POST(request: Request) {
 
 export async function GET(request: Request) {
   try {
-    if (!supabase) {
-      return NextResponse.json(
-        { error: "Supabase is not configured" },
-        { status: 500 }
-      );
+    const supabase = createClient();
+    
+    // Auth check for viewing orders
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { searchParams } = new URL(request.url);

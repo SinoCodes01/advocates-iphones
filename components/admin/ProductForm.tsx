@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Product } from "@/lib/types";
 import { Button } from "@/components/ui/Button";
 import { X, Loader2, Save } from "lucide-react";
+import { ImageUpload } from "@/components/admin/ImageUpload";
 
 interface ProductFormProps {
   product?: Product | null;
@@ -40,16 +41,16 @@ export function ProductForm({ product, onClose, onSuccess }: ProductFormProps) {
         name: product.name || "",
         slug: product.slug || "",
         price: product.price || 0,
-        compare_at_price: product.compareAtPrice || 0,
+        compare_at_price: (product as any).compare_at_price || product.compareAtPrice || 0,
         stock: product.stock || 0,
         condition: product.condition || "new",
         storage: product.storage || "",
         color: product.color || "",
-        color_hex: product.colorHex || "",
+        color_hex: (product as any).color_hex || product.colorHex || "",
         category: product.category || "",
         description: product.description || "",
-        warranty_months: product.warrantyMonths || 12,
-        battery_health: product.batteryHealth || 100,
+        warranty_months: (product as any).warranty_months || product.warrantyMonths || 12,
+        battery_health: (product as any).battery_health || product.batteryHealth || 100,
         active: product.active ?? true,
         featured: product.featured ?? false,
         images: product.images || [],
@@ -361,19 +362,12 @@ export function ProductForm({ product, onClose, onSuccess }: ProductFormProps) {
 
               <div>
                 <label className="block text-sm font-bold text-navy-900 mb-2">
-                  Image URL (one per line)
+                  Product Images *
                 </label>
-                <textarea
-                  rows={3}
-                  value={formData.images.join("\n")}
-                  onChange={(e) => 
-                    setFormData(prev => ({ 
-                      ...prev, 
-                      images: e.target.value.split("\n").filter(url => url.trim() !== "") 
-                    }))
-                  }
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl resize-none text-sm"
-                  placeholder="https://example.com/image.jpg"
+                <ImageUpload
+                  images={formData.images}
+                  onChange={(images) => setFormData((prev) => ({ ...prev, images }))}
+                  productId={product?.id}
                 />
               </div>
             </div>

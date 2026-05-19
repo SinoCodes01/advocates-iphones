@@ -1,15 +1,9 @@
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase-server";
 
 export async function GET(request: Request) {
   try {
-    if (!supabase) {
-      return NextResponse.json(
-        { error: "Supabase is not configured" },
-        { status: 500 }
-      );
-    }
-
+    const supabase = createClient();
     const { searchParams } = new URL(request.url);
     const category = searchParams.get("category");
     const condition = searchParams.get("condition");
@@ -22,7 +16,6 @@ export async function GET(request: Request) {
       .order("created_at", { ascending: false });
 
     // Only filter by active if not explicitly requested otherwise (e.g. for admin)
-    // For simplicity in MVP, admin sees all, customers see active
     const isAdmin = request.headers.get("referer")?.includes("/admin");
     if (!isAdmin) {
       query = query.eq("active", true);
@@ -60,9 +53,14 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    if (!supabase) throw new Error("Supabase not configured");
-    const body = await request.json();
+    const supabase = createClient();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    
+    if (authError || !user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
+    const body = await request.json();
     const { data, error } = await supabase
       .from("products")
       .insert(body)
@@ -83,7 +81,13 @@ export async function POST(request: Request) {
 
 export async function PATCH(request: Request) {
   try {
-    if (!supabase) throw new Error("Supabase not configured");
+    const supabase = createClient();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    
+    if (authError || !user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const body = await request.json();
     const { id, ...updates } = body;
 
@@ -110,7 +114,13 @@ export async function PATCH(request: Request) {
 
 export async function DELETE(request: Request) {
   try {
-    if (!supabase) throw new Error("Supabase not configured");
+    const supabase = createClient();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    
+    if (authError || !user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");
 

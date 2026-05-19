@@ -27,20 +27,44 @@ import {
 
 type Tab = "dashboard" | "products" | "orders";
 
+import { supabase } from "@/lib/supabase";
+import { useRouter } from "next/navigation";
+
 export default function AdminPage() {
   const [activeTab, setActiveTab] = useState<Tab>("dashboard");
   const [expandedOrder, setExpandedOrder] = useState<string | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [user, setUser] = useState<any>(null);
+  const router = useRouter();
 
   // Form/Modal state
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
-  const adminEmail = "ngqazolosinovuyo50@gmail.com";
+  useEffect(() => {
+    const checkUser = async () => {
+      if (!supabase) return;
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        router.push("/admin/login");
+      } else {
+        setUser(session.user);
+        fetchData();
+      }
+    };
+    checkUser();
+  }, [router]);
+
+  const handleLogout = async () => {
+    if (!supabase) return;
+    await supabase.auth.signOut();
+    router.push("/admin/login");
+  };
 
   const fetchData = async () => {
+    // ... rest of fetchData ...
     setIsLoading(true);
     try {
       const [productsRes, ordersRes] = await Promise.all([
@@ -104,7 +128,7 @@ export default function AdminPage() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-bold">Admin Dashboard</h1>
-              <p className="text-gray-400">Logged in as: {adminEmail}</p>
+              <p className="text-gray-400">Logged in as: {user?.email}</p>
             </div>
             <div className="flex items-center gap-4">
               <Link
@@ -114,7 +138,10 @@ export default function AdminPage() {
                 <Eye className="w-5 h-5" />
                 View Store
               </Link>
-              <button className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors">
+              <button 
+                onClick={handleLogout}
+                className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
+              >
                 <LogOut className="w-5 h-5" />
                 Logout
               </button>
