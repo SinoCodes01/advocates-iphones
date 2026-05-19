@@ -22,7 +22,7 @@ export function Header() {
             </span>
             <span className="flex items-center gap-1">
               <Phone className="w-4 h-4" />
-              061 234 5678
+              073 561 7081
             </span>
           </div>
           <span className="text-brand-400 font-medium">

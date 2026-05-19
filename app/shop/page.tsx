@@ -1,34 +1,59 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ProductGrid } from "@/components/storefront/ProductGrid";
-import { mockProducts, categories } from "@/lib/mock-data";
-import { Search, SlidersHorizontal, X } from "lucide-react";
+import { categories } from "@/lib/mock-data";
+import { Product } from "@/lib/types";
+import { Search, SlidersHorizontal, X, Loader2 } from "lucide-react";
 
 export default function ShopPage() {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [selectedCondition, setSelectedCondition] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState("featured");
   const [showFilters, setShowFilters] = useState(false);
 
-  const filteredProducts = mockProducts
-    .filter((p) => {
-      const matchesSearch =
-        p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        p.description?.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesCategory =
-        selectedCategory === "All" || p.category === selectedCategory;
-      const matchesCondition =
-        !selectedCondition || p.condition === selectedCondition;
-      return matchesSearch && matchesCategory && matchesCondition && p.active;
-    })
-    .sort((a, b) => {
-      if (sortBy === "price-low") return a.price - b.price;
-      if (sortBy === "price-high") return b.price - a.price;
-      if (sortBy === "featured") return (b.featured ? 1 : 0) - (a.featured ? 1 : 0);
-      return 0;
-    });
+  useEffect(() => {
+    async function fetchProducts() {
+      setIsLoading(true);
+      try {
+        const params = new URLSearchParams();
+        if (selectedCategory && selectedCategory !== "All") {
+          params.append("category", selectedCategory);
+        }
+        if (selectedCondition) {
+          params.append("condition", selectedCondition);
+        }
+        if (searchQuery) {
+          params.append("search", searchQuery);
+        }
+
+        const res = await fetch(`/api/products?${params.toString()}`);
+        const data = await res.json();
+
+        if (data.success) {
+          let sortedProducts = [...data.products];
+          if (sortBy === "price-low") sortedProducts.sort((a, b) => a.price - b.price);
+          else if (sortBy === "price-high") sortedProducts.sort((a, b) => b.price - a.price);
+          else if (sortBy === "featured") sortedProducts.sort((a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0));
+          
+          setProducts(sortedProducts);
+        }
+      } catch (error) {
+        console.error("Failed to fetch products:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    const timer = setTimeout(() => {
+      fetchProducts();
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [selectedCategory, selectedCondition, searchQuery, sortBy]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -155,15 +180,17 @@ export default function ShopPage() {
         </div>
 
         {/* Results count */}
-        <p className="text-gray-600 mb-6">
-          Showing {filteredProducts.length} product
-          {filteredProducts.length !== 1 ? "s" : ""}
-        </p>
+        <div className="flex items-center justify-between mb-6">
+          <p className="text-gray-600">
+            {isLoading ? "Searching..." : `Showing ${products.length} product${products.length !== 1 ? "s" : ""}`}
+          </p>
+          {isLoading && <Loader2 className="w-5 h-5 text-brand-500 animate-spin" />}
+        </div>
 
         {/* Product grid */}
-        {filteredProducts.length > 0 ? (
-          <ProductGrid products={filteredProducts} />
-        ) : (
+        {products.length > 0 ? (
+          <ProductGrid products={products} />
+        ) : !isLoading && (
           <div className="text-center py-16">
             <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <Search className="w-10 h-10 text-gray-400" />

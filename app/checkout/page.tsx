@@ -45,39 +45,41 @@ export default function CheckoutPage() {
   const handlePlaceOrder = async () => {
     setIsSubmitting(true);
 
-    // Generate order number
-    const newOrderNumber = generateOrderNumber();
-    setOrderNumber(newOrderNumber);
+    try {
+      const res = await fetch("/api/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...formData,
+          items,
+          subtotal,
+          total: subtotal + deliveryFee,
+        }),
+      });
 
-    // In a real app, this would save to Supabase
-    // For now, we'll simulate with mock data
-    const newOrder = {
-      id: Date.now().toString(),
-      orderNumber: newOrderNumber,
-      ...formData,
-      status: "pending" as const,
-      subtotal,
-      deliveryFee,
-      total: subtotal,
-      createdAt: new Date().toISOString(),
-      items: items.map((item) => ({
-        id: item.product.id,
-        productName: `${item.product.name}${item.product.storage ? ` ${item.product.storage}` : ""}${item.selectedVariant ? ` - ${item.selectedVariant}` : ""}`,
-        quantity: item.quantity,
-        unitPrice: item.product.price,
-        selectedVariant: item.selectedVariant,
-      })),
-    };
+      const data = await res.json();
 
-    mockOrders.push(newOrder);
-
-    // Clear cart and show confirmation
-    clearCart();
-    setStep("confirmation");
-    setIsSubmitting(false);
+      if (data.success) {
+        setOrderNumber(data.order.order_number);
+        // Clear cart and show confirmation
+        clearCart();
+        setStep("confirmation");
+      } else {
+        alert(data.error || "Failed to place order. Please try again.");
+      }
+    } catch (error) {
+      console.error("Checkout error:", error);
+      alert("An unexpected error occurred. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const whatsappLink = `https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "27612345678"}?text=Hi, I've placed order ${orderNumber}. My details: ${formData.customerName}, ${formData.phone}. Please confirm availability.`;
+  const whatsappMessage = orderNumber 
+    ? `Hi Advocates iPhones! I've just placed order ${orderNumber}.\n\n*My Order Details:*\n${items.map(i => `• ${i.product.name} x${i.quantity}`).join("\n")}\n\n*Total: ${formatPrice(subtotal + deliveryFee)}*\n\nCustomer Name: ${formData.customerName}\n\nPlease confirm availability and payment details. Thank you!`
+    : "";
+
+  const whatsappLink = `https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "27735617081"}?text=${encodeURIComponent(whatsappMessage)}`;
 
   if (items.length === 0 && step !== "confirmation") {
     return (

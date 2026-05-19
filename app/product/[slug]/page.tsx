@@ -3,12 +3,12 @@
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { useState } from "react";
-import { mockProducts } from "@/lib/mock-data";
+import { useEffect, useState } from "react";
 import { useCartStore } from "@/store/cart";
-import { formatPrice, conditionLabel } from "@/lib/utils";
+import { formatPrice } from "@/lib/utils";
 import { ConditionBadge, StockBadge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
+import { Product } from "@/lib/types";
 import {
   Shield,
   Battery,
@@ -18,17 +18,46 @@ import {
   ChevronRight,
   Check,
   MessageCircle,
-  Star,
+  Loader2,
 } from "lucide-react";
 
 export default function ProductPage() {
   const params = useParams();
   const slug = params.slug as string;
-  const product = mockProducts.find((p) => p.slug === slug);
+  const [product, setProduct] = useState<Product | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
 
   const { addItem, openCart } = useCartStore();
+
+  useEffect(() => {
+    async function fetchProduct() {
+      try {
+        const res = await fetch(`/api/products?search=${slug}`);
+        const data = await res.json();
+        if (data.success && data.products.length > 0) {
+          // Since we search by slug (which is unique), we take the first result
+          const found = data.products.find((p: Product) => p.slug === slug);
+          setProduct(found || data.products[0]);
+        }
+      } catch (error) {
+        console.error("Failed to fetch product:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    fetchProduct();
+  }, [slug]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="w-10 h-10 text-brand-500 animate-spin" />
+      </div>
+    );
+  }
 
   if (!product) {
     return (
@@ -53,9 +82,9 @@ export default function ProductPage() {
     openCart();
   };
 
-  const images = product.images.length > 0
+  const images = product.images && product.images.length > 0
     ? product.images
-    : ["/placeholder.jpg"];
+    : [];
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -125,12 +154,12 @@ export default function ProductPage() {
 
             {/* Thumbnails */}
             {images.length > 1 && (
-              <div className="flex gap-3">
+              <div className="flex gap-3 overflow-x-auto pb-2">
                 {images.map((img, index) => (
                   <button
                     key={index}
                     onClick={() => setSelectedImageIndex(index)}
-                    className={`w-20 h-20 rounded-xl overflow-hidden border-2 transition-colors ${
+                    className={`w-20 h-20 rounded-xl overflow-hidden border-2 transition-colors flex-shrink-0 ${
                       selectedImageIndex === index
                         ? "border-brand-500"
                         : "border-transparent hover:border-gray-300"
@@ -175,7 +204,7 @@ export default function ProductPage() {
                   </span>
                 )}
               </div>
-              {product.compareAtPrice && (
+              {product.compareAtPrice && product.compareAtPrice > product.price && (
                 <span className="inline-block bg-green-100 text-green-800 text-sm font-medium px-3 py-1 rounded-full">
                   Save {formatPrice(product.compareAtPrice - product.price)}
                 </span>
@@ -200,19 +229,20 @@ export default function ProductPage() {
             <div>
               <p className="text-sm font-medium text-gray-700 mb-2">Quantity</p>
               <div className="flex items-center gap-4">
-                <div className="flex items-center border border-gray-200 rounded-xl">
+                <div className="flex items-center border border-gray-200 rounded-xl overflow-hidden">
                   <button
                     onClick={() => setQuantity((q) => Math.max(1, q - 1))}
                     className="px-4 py-3 hover:bg-gray-100 transition-colors"
                   >
                     -
                   </button>
-                  <span className="px-4 py-3 font-medium min-w-[60px] text-center">
+                  <span className="px-4 py-3 font-medium min-w-[60px] text-center border-x border-gray-100">
                     {quantity}
                   </span>
                   <button
-                    onClick={() => setQuantity((q) => q + 1)}
+                    onClick={() => setQuantity((q) => Math.min(product.stock, q + 1))}
                     className="px-4 py-3 hover:bg-gray-100 transition-colors"
+                    disabled={quantity >= product.stock}
                   >
                     +
                   </button>
@@ -234,11 +264,11 @@ export default function ProductPage() {
                 {product.stock === 0 ? "Out of Stock" : "Add to Cart"}
               </Button>
               <a
-                href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "27612345678"}?text=Hi, I'm interested in ${product.name}`}
+                href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "27735617081"}?text=Hi Advocates iPhones! I'm interested in the ${product.name} ${product.storage || ""}. Is it still available?`}
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <Button variant="outline" size="lg" className="flex-1">
+                <Button variant="outline" size="lg" className="flex-1 w-full">
                   <MessageCircle className="w-5 h-5 mr-2" />
                   Ask on WhatsApp
                 </Button>
@@ -246,7 +276,7 @@ export default function ProductPage() {
             </div>
 
             {/* Trust badges */}
-            <div className="grid grid-cols-2 gap-4 pt-6 border-t">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-6 border-t">
               <div className="flex items-center gap-3">
                 <Shield className="w-5 h-5 text-brand-500" />
                 <div>

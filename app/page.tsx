@@ -1,15 +1,61 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { Hero } from "@/components/storefront/Hero";
 import { ProductGrid } from "@/components/storefront/ProductGrid";
-import { mockProducts } from "@/lib/mock-data";
+import { Product } from "@/lib/types";
 
 export default function HomePage() {
-  const featuredProducts = mockProducts.filter((p) => p.featured);
-  const newArrivals = mockProducts.slice(0, 4);
+  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
+  const [newArrivals, setNewArrivals] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchProducts() {
+      try {
+        const [featuredRes, newRes] = await Promise.all([
+          fetch("/api/products?featured=true"),
+          fetch("/api/products"),
+        ]);
+
+        const featuredData = await featuredRes.json();
+        const newData = await newRes.json();
+
+        if (featuredData.success) setFeaturedProducts(featuredData.products);
+        if (newData.success) setNewArrivals(newData.products.slice(0, 4));
+      } catch (error) {
+        console.error("Failed to fetch products:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    fetchProducts();
+  }, []);
 
   return (
     <div>
       <Hero />
-      <ProductGrid products={featuredProducts} title="Featured Products" />
+      
+      {isLoading ? (
+        <div className="container mx-auto px-4 py-16 text-center">
+          <div className="animate-pulse flex flex-col items-center">
+            <div className="h-8 w-64 bg-gray-200 rounded mb-8"></div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="h-80 bg-gray-100 rounded-2xl"></div>
+              ))}
+            </div>
+          </div>
+        </div>
+      ) : (
+        <>
+          {featuredProducts.length > 0 && (
+            <ProductGrid products={featuredProducts} title="Featured Products" />
+          )}
+        </>
+      )}
+
       <section className="bg-gradient-to-b from-gray-50 to-white py-16">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
@@ -23,7 +69,7 @@ export default function HomePage() {
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-white p-8 rounded-2xl shadow-card text-center">
+            <div className="bg-white p-8 rounded-2xl shadow-card text-center border border-gray-100">
               <div className="w-16 h-16 bg-brand-100 rounded-full flex items-center justify-center mx-auto mb-6">
                 <svg
                   className="w-8 h-8 text-brand-500"
@@ -48,7 +94,7 @@ export default function HomePage() {
               </p>
             </div>
 
-            <div className="bg-white p-8 rounded-2xl shadow-card text-center">
+            <div className="bg-white p-8 rounded-2xl shadow-card text-center border border-gray-100">
               <div className="w-16 h-16 bg-brand-100 rounded-full flex items-center justify-center mx-auto mb-6">
                 <svg
                   className="w-8 h-8 text-brand-500"
@@ -65,7 +111,7 @@ export default function HomePage() {
                 </svg>
               </div>
               <h3 className="text-xl font-bold text-navy-900 mb-3">
-                2 Year Warranty
+                Warranty Included
               </h3>
               <p className="text-gray-600">
                 All devices come with a comprehensive warranty. Any manufacturing
@@ -73,7 +119,7 @@ export default function HomePage() {
               </p>
             </div>
 
-            <div className="bg-white p-8 rounded-2xl shadow-card text-center">
+            <div className="bg-white p-8 rounded-2xl shadow-card text-center border border-gray-100">
               <div className="w-16 h-16 bg-brand-100 rounded-full flex items-center justify-center mx-auto mb-6">
                 <svg
                   className="w-8 h-8 text-brand-500"
@@ -100,7 +146,10 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-      <ProductGrid products={newArrivals} title="New Arrivals" />
+
+      {!isLoading && newArrivals.length > 0 && (
+        <ProductGrid products={newArrivals} title="New Arrivals" />
+      )}
     </div>
   );
 }
