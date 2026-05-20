@@ -60,7 +60,7 @@ export default function AdminPage() {
   const handleLogout = async () => {
     if (!supabase) return;
     await supabase.auth.signOut();
-    router.push("/admin/login");
+    window.location.href = "/admin/login";
   };
 
   const fetchData = async () => {
@@ -103,6 +103,27 @@ export default function AdminPage() {
       }
     } catch (error) {
       alert("An error occurred while deleting the product");
+    }
+  };
+
+  const handleToggleActive = async (product: Product) => {
+    try {
+      const res = await fetch(`/api/products`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: product.id,
+          active: !product.active,
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        fetchData();
+      } else {
+        alert(data.error || "Failed to update product status");
+      }
+    } catch (error) {
+      alert("An error occurred while updating the product status");
     }
   };
 
@@ -367,9 +388,15 @@ export default function AdminPage() {
                               <span className={product.stock === 0 ? "text-red-500" : "text-gray-700"}>{product.stock}</span>
                             </td>
                             <td className="px-6 py-4">
-                              <Badge variant={product.active ? "success" : "secondary"}>
-                                {product.active ? "Active" : "Inactive"}
-                              </Badge>
+                              <button
+                                onClick={() => handleToggleActive(product)}
+                                className="focus:outline-none"
+                                title={product.active ? "Click to deactivate" : "Click to activate"}
+                              >
+                                <Badge variant={product.active ? "success" : "secondary"}>
+                                  {product.active ? "Active" : "Inactive"}
+                                </Badge>
+                              </button>
                             </td>
                             <td className="px-6 py-4 text-right">
                               <div className="flex justify-end gap-2">
@@ -439,15 +466,15 @@ export default function AdminPage() {
                           <div className="grid md:grid-cols-2 gap-6">
                             <div>
                               <h4 className="text-sm font-bold text-gray-700 mb-2">Delivery Address</h4>
-                              <p className="text-sm text-gray-600 whitespace-pre-line">{order.delivery_address || order.deliveryAddress}</p>
+                              <p className="text-sm text-gray-600 whitespace-pre-line">{order.deliveryAddress}</p>
                             </div>
                             <div>
                               <h4 className="text-sm font-bold text-gray-700 mb-2">Order Items</h4>
                               <ul className="space-y-1">
-                                {(order.items || (order as any).order_items || []).map((item: any, i: number) => (
+                                {order.items?.map((item: any, i: number) => (
                                   <li key={i} className="flex justify-between text-sm">
-                                    <span>{item.product_name || item.productName} x{item.quantity}</span>
-                                    <span>{formatPrice(item.unit_price || item.unitPrice)}</span>
+                                    <span>{item.productName} x{item.quantity}</span>
+                                    <span>{formatPrice(item.unitPrice)}</span>
                                   </li>
                                 ))}
                               </ul>

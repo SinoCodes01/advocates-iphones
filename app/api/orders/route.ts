@@ -109,7 +109,27 @@ export async function GET(request: Request) {
 
     if (error) throw error;
 
-    return NextResponse.json({ orders: data, success: true });
+    // Normalize data to CamelCase for the frontend
+    const orders = data.map((order: any) => ({
+      ...order,
+      orderNumber: order.order_number,
+      customerName: order.customer_name,
+      deliveryAddress: order.delivery_address,
+      paymentMethod: order.payment_method,
+      deliveryFee: order.delivery_fee,
+      createdAt: order.created_at,
+      items: order.order_items.map((item: any) => ({
+        ...item,
+        orderId: item.order_id,
+        productId: item.product_id,
+        productName: item.product_name,
+        unitPrice: item.unit_price,
+        selectedVariant: item.selected_variant,
+        createdAt: item.created_at,
+      })),
+    }));
+
+    return NextResponse.json({ orders, success: true });
   } catch (error) {
     console.error("Orders fetch error:", error);
     return NextResponse.json(

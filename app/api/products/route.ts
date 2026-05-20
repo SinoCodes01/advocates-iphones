@@ -15,9 +15,11 @@ export async function GET(request: Request) {
       .select("*")
       .order("created_at", { ascending: false });
 
-    // Only filter by active if not explicitly requested otherwise (e.g. for admin)
-    const isAdmin = request.headers.get("referer")?.includes("/admin");
-    if (!isAdmin) {
+    // Verify session for active filter
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    // Only filter by active for non-authenticated users (storefront)
+    if (!user) {
       query = query.eq("active", true);
     }
 
@@ -41,7 +43,17 @@ export async function GET(request: Request) {
 
     if (error) throw error;
 
-    return NextResponse.json({ products: data, success: true });
+    // Normalize data to CamelCase for the frontend
+    const products = data.map((product: any) => ({
+      ...product,
+      compareAtPrice: product.compare_at_price,
+      colorHex: product.color_hex,
+      warrantyMonths: product.warranty_months,
+      batteryHealth: product.battery_health,
+      createdAt: product.created_at,
+    }));
+
+    return NextResponse.json({ products, success: true });
   } catch (error) {
     console.error("Products fetch error:", error);
     return NextResponse.json(

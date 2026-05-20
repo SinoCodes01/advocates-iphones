@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/Button";
@@ -14,6 +14,18 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
+  // Redirect if already logged in
+  useEffect(() => {
+    const checkUser = async () => {
+      if (!supabase) return;
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        router.push("/admin");
+      }
+    };
+    checkUser();
+  }, [router]);
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -22,18 +34,20 @@ export default function LoginPage() {
     try {
       if (!supabase) throw new Error("Supabase not configured");
 
-      const { error } = await supabase.auth.signInWithPassword({
+      const { error, data } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (error) throw error;
 
-      router.push("/admin");
-      router.refresh();
+      if (data.user) {
+        // Use window.location.href for a full page reload to ensure 
+        // middleware correctly picks up the new session cookies
+        window.location.href = "/admin";
+      }
     } catch (err: any) {
       setError(err.message || "Invalid login credentials");
-    } finally {
       setIsLoading(false);
     }
   };
