@@ -7,7 +7,7 @@ import { Shield, MessageCircle, ShoppingBag, CheckCircle2 } from "lucide-react";
 
 export function Hero() {
   return (
-    <section className="relative bg-white overflow-hidden min-h-[80vh] flex items-center">
+    <section className="relative bg-white overflow-hidden flex flex-col min-h-screen">
       {/* Wave Background Pattern */}
       <div className="absolute inset-0 z-0">
         <svg
@@ -40,32 +40,32 @@ export function Hero() {
       <div className="absolute top-1/4 -right-20 w-96 h-96 bg-brand-500/20 rounded-full blur-[100px]" />
       <div className="absolute bottom-1/4 -left-20 w-96 h-96 bg-navy-900/10 rounded-full blur-[100px]" />
 
-      <div className="relative z-10 container mx-auto px-4 py-20">
-        <div className="grid lg:grid-cols-2 gap-16 items-center">
+      <div className="relative z-10 container mx-auto px-4 flex-grow flex items-center py-0 pb-8">
+        <div className="grid lg:grid-cols-2 gap-12 items-center w-full">
           {/* Left content */}
           <div className="text-center lg:text-left">
-            <div className="inline-flex items-center gap-2 bg-brand-50 border border-brand-100 rounded-full px-4 py-2 mb-8">
+            <div className="inline-flex items-center gap-2 bg-brand-50 border border-brand-100 rounded-full px-6 py-2.5 mb-8 shadow-sm">
               <CheckCircle2 className="w-4 h-4 text-brand-500" />
               <span className="text-sm font-bold text-navy-900 uppercase tracking-wider">
                 Value You Can Trust
               </span>
             </div>
 
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-extrabold text-navy-900 leading-[1.1] mb-8">
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold text-navy-900 leading-[1.1] mb-6">
               Premium iPhones. <br />
               <span className="text-brand-500">Unbeatable Prices.</span>
             </h1>
 
-            <p className="text-lg md:text-xl text-gray-600 mb-10 max-w-xl mx-auto lg:mx-0 font-medium">
+            <p className="text-lg md:text-xl text-gray-600 mb-8 max-w-xl mx-auto lg:mx-0 font-medium">
               Discover the perfect balance of luxury and affordability. 
               Brand new and certified refurbished iPhones with guaranteed authenticity.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+            <div className="flex flex-col sm:flex-row gap-5 justify-center lg:justify-start">
               <Link href="/shop">
                 <Button
                   size="lg"
-                  className="w-full sm:w-auto bg-navy-900 hover:bg-navy-800 text-white px-10 h-14 rounded-full text-lg font-bold transition-all hover:scale-105 shadow-xl"
+                  className="w-full sm:w-auto bg-brand-500 hover:bg-brand-600 text-white px-12 h-16 rounded-full text-lg font-bold transition-all hover:scale-105 shadow-2xl shadow-brand-500/30"
                 >
                   Shop Now
                 </Button>
@@ -78,7 +78,7 @@ export function Hero() {
                 <Button
                   variant="outline"
                   size="lg"
-                  className="w-full sm:w-auto border-2 border-navy-900 text-navy-900 hover:bg-navy-50 px-10 h-14 rounded-full text-lg font-bold"
+                  className="w-full sm:w-auto border-2 border-navy-900/20 text-navy-900 hover:bg-navy-50 px-10 h-16 rounded-full text-lg font-semibold"
                 >
                   <MessageCircle className="w-5 h-5 mr-2" />
                   WhatsApp Us
@@ -89,16 +89,16 @@ export function Hero() {
           </div>
 
           {/* Right content - Premium Showcase */}
-          <div className="relative">
-            <div className="relative w-full aspect-square max-w-lg mx-auto">
+          <div className="relative pt-12 lg:pt-0">
+            <div className="relative w-full aspect-square max-w-md mx-auto">
               {/* Pedestal effect */}
-              <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[120%] h-32 bg-gradient-to-t from-gray-100 to-transparent rounded-[100%] blur-2xl opacity-50" />
+              <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[120%] h-32 bg-gradient-to-t from-brand-500/10 to-transparent rounded-[100%] blur-3xl opacity-60" />
               
               {/* Concentric circles bg */}
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                 <div className="w-full h-full border border-brand-500/10 rounded-full animate-ping-slow" />
                 <div className="absolute w-[80%] h-[80%] border border-brand-500/20 rounded-full" />
-                <div className="absolute w-[60%] h-[60%] border border-brand-500/30 rounded-full shadow-[inset_0_0_50px_rgba(0,127,255,0.1)]" />
+                <div className="absolute w-[60%] h-[60%] border border-brand-500/30 rounded-full shadow-[inset_0_0_50px_rgba(0,127,255,0.05)]" />
               </div>
 
               {/* iPhone Image Placeholder / Illustration */}
@@ -114,7 +114,7 @@ export function Hero() {
                        />
                     </div>
                     <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center">
-                      <div className="w-16 h-16 bg-brand-500 rounded-2xl flex items-center justify-center mb-4 shadow-glow">
+                      <div className="w-16 h-16 bg-brand-500 rounded-2xl flex items-center justify-center mb-4 shadow-[0_0_20px_rgba(0,127,255,0.5)]">
                         <ShoppingBag className="w-8 h-8 text-white" />
                       </div>
                       <p className="text-white font-bold text-xl uppercase tracking-tighter italic">Advocates</p>
@@ -131,28 +131,35 @@ export function Hero() {
       </div>
 
       {/* Trust Strip */}
-      <div className="absolute bottom-0 w-full bg-navy-900 py-6">
+      <div className="w-full bg-navy-900/95 backdrop-blur-sm py-8 border-t border-white/10 mt-auto">
         <div className="container mx-auto px-4">
-          <div className="flex flex-wrap justify-center md:justify-between gap-8 md:gap-4 items-center">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-brand-500/10 rounded-lg flex items-center justify-center border border-brand-500/20">
-                <Shield className="w-5 h-5 text-brand-400" />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
+            <div className="flex items-center justify-center gap-4">
+              <div className="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center">
+                <Shield className="w-6 h-6 text-brand-400" />
               </div>
-              <span className="text-xs md:text-sm font-bold text-white tracking-widest uppercase">Authentic Products</span>
+              <div className="flex flex-col">
+                <span className="text-sm font-bold text-white uppercase tracking-wider">Authentic</span>
+                <span className="text-xs text-gray-400">Guaranteed quality</span>
+              </div>
             </div>
-            <div className="hidden md:block h-8 w-px bg-white/10" />
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-brand-500/10 rounded-lg flex items-center justify-center border border-brand-500/20">
-                <CheckCircle2 className="w-5 h-5 text-brand-400" />
+            <div className="flex items-center justify-center gap-4">
+              <div className="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center">
+                <CheckCircle2 className="w-6 h-6 text-brand-400" />
               </div>
-              <span className="text-xs md:text-sm font-bold text-white tracking-widest uppercase">Trusted Service</span>
+              <div className="flex flex-col">
+                <span className="text-sm font-bold text-white uppercase tracking-wider">Trusted</span>
+                <span className="text-xs text-gray-400">Verified service</span>
+              </div>
             </div>
-            <div className="hidden md:block h-8 w-px bg-white/10" />
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-brand-500/10 rounded-lg flex items-center justify-center border border-brand-500/20">
-                <ShoppingBag className="w-5 h-5 text-brand-400" />
+            <div className="flex items-center justify-center gap-4">
+              <div className="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center">
+                <ShoppingBag className="w-6 h-6 text-brand-400" />
               </div>
-              <span className="text-xs md:text-sm font-bold text-white tracking-widest uppercase">Great Prices Everytime</span>
+              <div className="flex flex-col">
+                <span className="text-sm font-bold text-white uppercase tracking-wider">Value</span>
+                <span className="text-xs text-gray-400">Best prices always</span>
+              </div>
             </div>
           </div>
         </div>
