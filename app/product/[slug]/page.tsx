@@ -34,12 +34,10 @@ export default function ProductPage() {
   useEffect(() => {
     async function fetchProduct() {
       try {
-        const res = await fetch(`/api/products?search=${slug}`);
+        const res = await fetch(`/api/products?slug=${encodeURIComponent(slug)}`);
         const data = await res.json();
         if (data.success && data.products.length > 0) {
-          // Since we search by slug (which is unique), we take the first result
-          const found = data.products.find((p: Product) => p.slug === slug);
-          setProduct(found || data.products[0]);
+          setProduct(data.products[0]);
         }
       } catch (error) {
         console.error("Failed to fetch product:", error);

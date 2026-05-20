@@ -9,6 +9,7 @@ export async function GET(request: Request) {
     const condition = searchParams.get("condition");
     const search = searchParams.get("search");
     const featured = searchParams.get("featured");
+    const slug = searchParams.get("slug");
 
     let query = supabase
       .from("products")
@@ -21,6 +22,10 @@ export async function GET(request: Request) {
     // Only filter by active for non-authenticated users (storefront)
     if (!user) {
       query = query.eq("active", true);
+    }
+
+    if (slug) {
+      query = query.eq("slug", slug);
     }
 
     if (category && category !== "All") {
