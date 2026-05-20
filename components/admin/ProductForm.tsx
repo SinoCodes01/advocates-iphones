@@ -22,7 +22,7 @@ export function ProductForm({ product, onClose, onSuccess }: ProductFormProps) {
     price: 0,
     compare_at_price: 0,
     stock: 0,
-    condition: "new" as const,
+    condition: "new" as "new" | "refurbished" | "pre-owned",
     storage: "",
     color: "",
     color_hex: "",

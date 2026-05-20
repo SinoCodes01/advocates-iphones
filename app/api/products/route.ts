@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidateTag } from "next/cache";
 import { createClient } from "@/lib/supabase-server";
 
 export async function GET(request: Request) {
@@ -168,6 +169,8 @@ export async function DELETE(request: Request) {
     const { error } = await supabase.from("products").delete().eq("id", id);
 
     if (error) throw error;
+
+    revalidateTag("products");
 
     return NextResponse.json({ success: true });
   } catch (error: any) {

@@ -327,10 +327,10 @@ export default function AdminPage() {
                       >
                         <div>
                           <p className="font-medium text-gray-900">
-                            {order.orderNumber || order.order_number}
+                            {order.orderNumber}
                           </p>
                           <p className="text-sm text-gray-500">
-                            {order.customerName || order.customer_name} • {formatPrice(order.total)}
+                            {order.customerName} • {formatPrice(order.total)}
                           </p>
                         </div>
                         <Badge
@@ -416,7 +416,7 @@ export default function AdminPage() {
                                 className="focus:outline-none"
                                 title={product.active ? "Click to deactivate" : "Click to activate"}
                               >
-                                <Badge variant={product.active ? "success" : "secondary"}>
+                                <Badge variant={product.active ? "success" : "default"}>
                                   {product.active ? "Active" : "Inactive"}
                                 </Badge>
                               </button>
@@ -470,11 +470,11 @@ export default function AdminPage() {
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-6">
                             <div>
-                              <p className="font-bold text-gray-900">{order.order_number || order.orderNumber}</p>
-                              <p className="text-xs text-gray-500">{new Date(order.created_at || order.createdAt).toLocaleDateString()}</p>
+                              <p className="font-bold text-gray-900">{order.orderNumber}</p>
+                              <p className="text-xs text-gray-500">{new Date(order.createdAt).toLocaleDateString()}</p>
                             </div>
                             <div>
-                              <p className="font-medium">{order.customer_name || order.customerName}</p>
+                              <p className="font-medium">{order.customerName}</p>
                               <p className="text-xs text-gray-500">{order.phone}</p>
                             </div>
                             <p className="font-bold text-navy-900">{formatPrice(order.total)}</p>

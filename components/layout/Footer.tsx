@@ -180,7 +180,7 @@ export function Footer() {
       <div className="border-t border-navy-800 py-6">
         <div className="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-gray-400 text-sm">
-            © {new Date().getFullYear()} Advocates iPhones. All rights reserved.
+            © {new Date().getFullYear()} Advocates iPhones. All rights reserved. Made by SinoCodes01.
           </p>
           <div className="flex gap-6 text-sm">
             <Link href="/help/privacy" className="text-gray-400 hover:text-white transition-colors">
