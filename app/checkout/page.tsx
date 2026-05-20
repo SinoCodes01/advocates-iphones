@@ -247,7 +247,7 @@ export default function CheckoutPage() {
                         Payment Method *
                       </label>
                       <div className="space-y-3">
-                        <label className="flex items-center gap-3 p-4 border border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50 transition-colors">
+                        <label className="flex items-center gap-3 p-4 border border-brand-500 bg-brand-50/50 rounded-xl cursor-pointer transition-colors">
                           <input
                             type="radio"
                             name="paymentMethod"
@@ -257,25 +257,9 @@ export default function CheckoutPage() {
                             className="w-5 h-5 text-brand-500"
                           />
                           <div className="flex-1">
-                            <p className="font-medium">WhatsApp Payment</p>
-                            <p className="text-sm text-gray-500">
-                              Confirm order via WhatsApp and pay via EFT
-                            </p>
-                          </div>
-                        </label>
-                        <label className="flex items-center gap-3 p-4 border border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50 transition-colors">
-                          <input
-                            type="radio"
-                            name="paymentMethod"
-                            value="eft"
-                            checked={formData.paymentMethod === "eft"}
-                            onChange={handleInputChange}
-                            className="w-5 h-5 text-brand-500"
-                          />
-                          <div className="flex-1">
-                            <p className="font-medium">EFT Transfer</p>
-                            <p className="text-sm text-gray-500">
-                              Pay directly to our bank account
+                            <p className="font-medium text-navy-900">WhatsApp Payment</p>
+                            <p className="text-sm text-gray-600">
+                              Confirm order via WhatsApp and pay via EFT/Cash
                             </p>
                           </div>
                         </label>

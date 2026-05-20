@@ -11,8 +11,8 @@ interface ProductCardProps {
 
 export function ProductCard({ product }: ProductCardProps) {
   return (
-    <Link href={`/product/${product.slug}`}>
-      <div className="group bg-white rounded-2xl border border-gray-100 shadow-card hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300 overflow-hidden h-full flex flex-col">
+    <Link href={`/product/${product.slug}`} className="block h-full">
+      <div className="group bg-white rounded-2xl border border-gray-100 shadow-card hover:shadow-card-hover hover:-translate-y-1 active:scale-[0.98] transition-all duration-300 overflow-hidden h-full flex flex-col">
         {/* Image */}
         <div className="relative aspect-square bg-gray-50 overflow-hidden">
           {product.images[0] ? (

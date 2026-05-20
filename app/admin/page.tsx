@@ -88,6 +88,29 @@ export default function AdminPage() {
     fetchData();
   }, [activeTab]);
 
+  const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);
+
+  const handleUpdateOrderStatus = async (orderId: string, newStatus: string) => {
+    setUpdatingOrderId(orderId);
+    try {
+      const res = await fetch("/api/orders", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: orderId, status: newStatus }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        fetchData();
+      } else {
+        alert(data.error || "Failed to update order status");
+      }
+    } catch (error) {
+      alert("An error occurred while updating the order status");
+    } finally {
+      setUpdatingOrderId(null);
+    }
+  };
+
   const handleDeleteProduct = async (id: string) => {
     if (!confirm("Are you sure you want to delete this product?")) return;
 
@@ -480,7 +503,33 @@ export default function AdminPage() {
                               </ul>
                             </div>
                           </div>
-                          <div className="flex gap-4 pt-4 border-t">
+                          <div className="flex flex-wrap items-center gap-4 pt-4 border-t">
+                            <div className="flex items-center gap-2">
+                              <label className="text-sm font-medium text-gray-700">Status:</label>
+                              <select 
+                                defaultValue={order.status}
+                                onChange={(e) => order.status = e.target.value as any}
+                                className="text-sm border rounded-lg px-2 py-1 focus:ring-2 focus:ring-brand-500 outline-none"
+                              >
+                                <option value="pending">Pending</option>
+                                <option value="confirmed">Confirmed</option>
+                                <option value="packed">Packed</option>
+                                <option value="shipped">Shipped</option>
+                                <option value="delivered">Delivered</option>
+                                <option value="cancelled">Cancelled</option>
+                              </select>
+                              <Button 
+                                size="sm" 
+                                onClick={(e) => {
+                                  const select = (e.currentTarget.previousSibling as HTMLSelectElement);
+                                  handleUpdateOrderStatus(order.id, select.value);
+                                }}
+                                loading={updatingOrderId === order.id}
+                              >
+                                Update Status
+                              </Button>
+                            </div>
+                            <div className="h-6 w-px bg-gray-200 mx-2 hidden md:block" />
                             <a href={`https://wa.me/${order.phone}`} target="_blank" rel="noopener noreferrer">
                               <Button variant="outline" size="sm"><MessageCircle className="w-4 h-4 mr-2" /> WhatsApp Customer</Button>
                             </a>

@@ -390,14 +390,8 @@ export function ProductForm({ product, onClose, onSuccess }: ProductFormProps) {
             loading={isSubmitting}
             className="min-w-[140px]"
           >
-            {isSubmitting ? (
-              <Loader2 className="w-5 h-5 animate-spin" />
-            ) : (
-              <>
-                <Save className="w-5 h-5 mr-2" />
-                {product ? "Update Product" : "Create Product"}
-              </>
-            )}
+            <Save className="w-5 h-5 mr-2" />
+            {product ? "Update Product" : "Create Product"}
           </Button>
         </div>
       </div>
