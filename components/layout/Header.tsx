@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { ShoppingBag, Menu, X, MapPin, Phone } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useCartStore } from "@/store/cart";
@@ -23,31 +24,37 @@ export function Header() {
         <div className="container mx-auto px-4 flex justify-between items-center">
           <div className="flex items-center gap-4">
             <span className="flex items-center gap-1">
-              <MapPin className="w-4 h-4" />
+              <MapPin className="w-4 h-4 text-brand-400" />
               Cape Town, South Africa
             </span>
             <span className="flex items-center gap-1">
-              <Phone className="w-4 h-4" />
+              <Phone className="w-4 h-4 text-brand-400" />
               073 561 7081
             </span>
           </div>
-          <span className="text-brand-400 font-medium">
-            Trusted iPhone Reseller
+          <span className="text-brand-400 font-medium tracking-wide">
+            LAW. TRUST. TECHNOLOGY.
           </span>
         </div>
       </div>
 
       {/* Main header */}
-      <div className="container mx-auto px-4 py-4">
+      <div className="container mx-auto px-4 py-3">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-10 h-10 bg-gradient-to-br from-navy-700 to-brand-500 rounded-xl flex items-center justify-center">
-              <span className="text-white font-bold text-lg">A</span>
+          <Link href="/" className="flex items-center gap-3 group">
+            <div className="relative w-12 h-12 md:w-14 md:h-14 transition-transform group-hover:scale-105">
+              <Image
+                src="/images/advocates-logo.png"
+                alt="Advocates iPhones Logo"
+                fill
+                className="object-contain"
+                priority
+              />
             </div>
-            <div>
-              <span className="font-bold text-xl text-navy-900">Advocates</span>
-              <span className="text-brand-500 font-bold"> iPhones</span>
+            <div className="hidden sm:block">
+              <span className="font-bold text-xl md:text-2xl text-navy-900 tracking-tight block leading-tight">Advocates</span>
+              <span className="text-brand-500 font-bold text-base md:text-lg block leading-none -mt-1 uppercase tracking-widest">iPhones</span>
             </div>
           </Link>
 

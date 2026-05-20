@@ -25,12 +25,12 @@ export function Badge({ variant = "default", children, className }: BadgeProps) 
 }
 
 export function ConditionBadge({ condition }: { condition: string }) {
-  const variant =
+  const styles =
     condition === "new"
-      ? "success"
+      ? "bg-brand-500 text-white"
       : condition === "refurbished"
-      ? "info"
-      : "warning";
+      ? "bg-navy-900 text-white"
+      : "bg-gray-100 text-gray-800";
 
   const label =
     condition === "new"
@@ -39,7 +39,11 @@ export function ConditionBadge({ condition }: { condition: string }) {
       ? "Refurbished"
       : "Pre-Owned";
 
-  return <Badge variant={variant}>{label}</Badge>;
+  return (
+    <span className={cn("px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest shadow-sm", styles)}>
+      {label}
+    </span>
+  );
 }
 
 export function StockBadge({ stock }: { stock: number }) {

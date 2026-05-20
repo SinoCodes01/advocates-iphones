@@ -1,58 +1,50 @@
 import Link from "next/link";
+import Image from "next/image";
 import {
   MapPin,
   Phone,
   Mail,
-  Shield,
-  RefreshCw,
-  Truck,
-  CreditCard,
   Instagram,
   Facebook,
   MessageCircle,
+  Shield,
+  ShoppingBag,
 } from "lucide-react";
 
 export function Footer() {
   return (
     <footer className="bg-navy-900 text-white">
       {/* Trust badges */}
-      <div className="border-b border-navy-800">
-        <div className="container mx-auto px-4 py-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-navy-800 rounded-full flex items-center justify-center">
-                <Shield className="w-6 h-6 text-brand-400" />
+      <div className="border-b border-navy-800 bg-navy-900/50">
+        <div className="container mx-auto px-4 py-10">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 text-center sm:text-left">
+            <div className="flex flex-col sm:flex-row items-center gap-4 group">
+              <div className="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center border border-white/10 group-hover:border-brand-500 transition-colors">
+                <div className="relative w-8 h-8">
+                  <Shield className="w-8 h-8 text-brand-400" />
+                </div>
               </div>
               <div>
-                <p className="font-semibold">100% Authentic</p>
-                <p className="text-sm text-gray-400">Verified genuine products</p>
+                <p className="font-bold text-lg">AUTHENTIC PRODUCTS</p>
+                <p className="text-sm text-gray-400">Verified genuine Apple devices</p>
               </div>
             </div>
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-navy-800 rounded-full flex items-center justify-center">
-                <RefreshCw className="w-6 h-6 text-brand-400" />
+            <div className="flex flex-col sm:flex-row items-center gap-4 group">
+              <div className="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center border border-white/10 group-hover:border-brand-500 transition-colors">
+                <MessageCircle className="w-8 h-8 text-brand-400" />
               </div>
               <div>
-                <p className="font-semibold">Easy Returns</p>
-                <p className="text-sm text-gray-400">7-day return policy</p>
+                <p className="font-bold text-lg uppercase">Trusted Service</p>
+                <p className="text-sm text-gray-400">Exceptional support & care</p>
               </div>
             </div>
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-navy-800 rounded-full flex items-center justify-center">
-                <Truck className="w-6 h-6 text-brand-400" />
+            <div className="flex flex-col sm:flex-row items-center gap-4 group">
+              <div className="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center border border-white/10 group-hover:border-brand-500 transition-colors">
+                <ShoppingBag className="w-8 h-8 text-brand-400" />
               </div>
               <div>
-                <p className="font-semibold">Nationwide Delivery</p>
-                <p className="text-sm text-gray-400">Reliable shipping</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-navy-800 rounded-full flex items-center justify-center">
-                <CreditCard className="w-6 h-6 text-brand-400" />
-              </div>
-              <div>
-                <p className="font-semibold">Secure Payment</p>
-                <p className="text-sm text-gray-400">EFT & WhatsApp pay</p>
+                <p className="font-bold text-lg uppercase">Great Prices Everytime</p>
+                <p className="text-sm text-gray-400">Unbeatable value guaranteed</p>
               </div>
             </div>
           </div>
@@ -60,19 +52,24 @@ export function Footer() {
       </div>
 
       {/* Main footer */}
-      <div className="container mx-auto px-4 py-12">
-        <div className="grid md:grid-cols-4 gap-8">
+      <div className="container mx-auto px-4 py-16">
+        <div className="grid md:grid-cols-4 gap-12">
           {/* Brand */}
-          <div>
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-10 h-10 bg-gradient-to-br from-navy-600 to-brand-500 rounded-xl flex items-center justify-center">
-                <span className="text-white font-bold text-lg">A</span>
+          <div className="col-span-1 md:col-span-1">
+            <Link href="/" className="flex items-center gap-3 mb-6">
+              <div className="relative w-12 h-12">
+                <Image
+                  src="/images/advocates-logo.png"
+                  alt="Advocates iPhones Logo"
+                  fill
+                  className="object-contain brightness-0 invert"
+                />
               </div>
               <div>
-                <span className="font-bold text-xl">Advocates</span>
-                <span className="text-brand-400 font-bold"> iPhones</span>
+                <span className="font-bold text-xl block leading-tight">Advocates</span>
+                <span className="text-brand-400 font-bold text-sm block leading-none uppercase tracking-widest">iPhones</span>
               </div>
-            </div>
+            </Link>
             <p className="text-gray-400 mb-4">
               Your trusted partner for premium iPhones and accessories in South
               Africa.
