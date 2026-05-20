@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useCartStore } from "@/store/cart";
 import { formatPrice } from "@/lib/utils";
 import { ConditionBadge, StockBadge } from "@/components/ui/Badge";
@@ -23,10 +23,15 @@ interface ProductDetailsClientProps {
 }
 
 export function ProductDetailsClient({ product }: ProductDetailsClientProps) {
+  const [mounted, setMounted] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
 
   const { addItem, openCart } = useCartStore();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleAddToCart = () => {
     addItem(product, quantity);
@@ -127,17 +132,17 @@ export function ProductDetailsClient({ product }: ProductDetailsClientProps) {
         <div className="space-y-2">
           <div className="flex items-baseline gap-3">
             <span className="text-4xl font-bold text-navy-900">
-              {formatPrice(product.price)}
+              {mounted ? formatPrice(product.price) : "..."}
             </span>
             {product.compareAtPrice && (
               <span className="text-xl text-gray-400 line-through">
-                {formatPrice(product.compareAtPrice)}
+                {mounted ? formatPrice(product.compareAtPrice) : "..."}
               </span>
             )}
           </div>
           {product.compareAtPrice && product.compareAtPrice > product.price && (
             <span className="inline-block bg-green-100 text-green-800 text-sm font-medium px-3 py-1 rounded-full">
-              Save {formatPrice(product.compareAtPrice - product.price)}
+              Save {mounted ? formatPrice(product.compareAtPrice - product.price) : "..."}
             </span>
           )}
         </div>

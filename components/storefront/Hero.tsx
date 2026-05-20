@@ -51,12 +51,12 @@ export function Hero() {
               </span>
             </div>
 
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold text-navy-900 leading-[1.1] mb-6">
+            <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-extrabold text-navy-900 leading-[1.1] mb-6">
               Premium iPhones. <br />
               <span className="text-brand-500">Unbeatable Prices.</span>
             </h1>
 
-            <p className="text-lg md:text-xl text-gray-600 mb-8 max-w-xl mx-auto lg:mx-0 font-medium">
+            <p className="text-base sm:text-lg md:text-xl text-gray-600 mb-8 max-w-xl mx-auto lg:mx-0 font-medium">
               Discover the perfect balance of luxury and affordability. 
               Brand new and certified refurbished iPhones with guaranteed authenticity.
             </p>
@@ -65,7 +65,7 @@ export function Hero() {
               <Link href="/shop">
                 <Button
                   size="lg"
-                  className="w-full sm:w-auto bg-brand-500 hover:bg-brand-600 text-white px-12 h-16 rounded-full text-lg font-bold transition-all hover:scale-105 shadow-2xl shadow-brand-500/30"
+                  className="w-full sm:w-auto bg-brand-500 hover:bg-brand-600 text-white px-8 sm:px-12 h-14 sm:h-16 rounded-full text-lg font-bold transition-all hover:scale-105 shadow-2xl shadow-brand-500/30"
                 >
                   Shop Now
                 </Button>
@@ -78,7 +78,7 @@ export function Hero() {
                 <Button
                   variant="outline"
                   size="lg"
-                  className="w-full sm:w-auto border-2 border-navy-900/20 text-navy-900 hover:bg-navy-50 px-10 h-16 rounded-full text-lg font-semibold"
+                  className="w-full sm:w-auto border-2 border-navy-900/20 text-navy-900 hover:bg-navy-50 px-8 sm:px-10 h-14 sm:h-16 rounded-full text-lg font-semibold"
                 >
                   <MessageCircle className="w-5 h-5 mr-2" />
                   WhatsApp Us
@@ -89,8 +89,8 @@ export function Hero() {
           </div>
 
           {/* Right content - Premium Showcase */}
-          <div className="relative pt-12 lg:pt-0">
-            <div className="relative w-full aspect-square max-w-md mx-auto">
+          <div className="relative pt-8 lg:pt-0">
+            <div className="relative w-full aspect-square max-w-[280px] sm:max-w-md mx-auto">
               {/* Pedestal effect */}
               <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[120%] h-32 bg-gradient-to-t from-brand-500/10 to-transparent rounded-[100%] blur-3xl opacity-60" />
               
@@ -104,34 +104,31 @@ export function Hero() {
               {/* iPhone Illustration */}
               <div className="relative z-10 flex items-center justify-center h-full group">
                 {/* Main iPhone device */}
-                <div className="relative w-64 h-[520px] bg-white rounded-[3rem] shadow-xl border-4 border-gray-200 p-4 transform rotate-3 transition-transform group-hover:rotate-0 duration-500">
+                <div className="relative w-48 sm:w-64 h-[380px] sm:h-[520px] bg-white rounded-[2.5rem] sm:rounded-[3rem] shadow-xl border-4 border-gray-200 p-3 sm:p-4 transform rotate-3 transition-transform group-hover:rotate-0 duration-500">
                   {/* iPhone notch */}
-                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-28 h-4 bg-black rounded-b-xl z-20"></div>
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-20 sm:w-28 h-3 sm:h-4 bg-black rounded-b-xl z-20"></div>
 
                   {/* iPhone screen */}
                   <div className="w-full h-full bg-white rounded-[2rem] overflow-hidden relative">
                     {/* Screen content with simplified branding */}
-                    <div className="absolute inset-0 flex flex-col items-center justify-center p-6">
+                    <div className="absolute inset-0 flex flex-col items-center justify-center p-4 sm:p-6">
                       {/* Centered logo with premium sizing */}
                       <Image
                         src="/images/advocates-logo.png"
                         alt="Advocates iPhones Logo"
-                        width={120}
-                        height={120}
-                        priority
-                        className="object-contain mb-4"
+                        width={80}
+                        height={80}
+                        className="sm:w-[120px] sm:h-[120px] object-contain mb-3 sm:mb-4"
                       />
                       {/* Business name underneath */}
                       <div className="text-center">
-                        <h3 className="text-xl font-bold text-navy-900">Advocates</h3>
-                        <p className="text-brand-500 text-sm tracking-widest uppercase">iPhones</p>
+                        <h3 className="text-lg sm:text-xl font-bold text-navy-900">Advocates</h3>
+                        <p className="text-brand-500 text-xs sm:text-sm tracking-widest uppercase">iPhones</p>
                       </div>
                     </div>
                   </div>
                 </div>
-
-                {/* Secondary iPhone (shadow effect) */}
-                              </div>
+              </div>
             </div>
           </div>
         </div>

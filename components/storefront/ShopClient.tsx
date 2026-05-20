@@ -24,6 +24,15 @@ export function ShopClient({ initialProducts }: ShopClientProps) {
   const [sortBy, setSortBy] = useState("featured");
   const [showMobileFilters, setShowMobileFilters] = useState(false);
 
+  // Lock scroll when mobile filters are open
+  useEffect(() => {
+    if (showMobileFilters) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+  }, [showMobileFilters]);
+
   // We only fetch client-side if filters are active
   const hasActiveFilters = 
     selectedCategories.length > 0 || 

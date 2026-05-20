@@ -1,3 +1,6 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Product } from "@/lib/types";
@@ -10,6 +13,12 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product }: ProductCardProps) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   return (
     <Link href={`/product/${product.slug}`} className="block h-full group">
       <div className="bg-white rounded-[2rem] border border-gray-100 shadow-sm hover:shadow-glow transition-all duration-500 overflow-hidden h-full flex flex-col relative">
@@ -71,7 +80,7 @@ export function ProductCard({ product }: ProductCardProps) {
             <div>
               <div className="flex items-baseline gap-2">
                 <span className="text-2xl font-black text-navy-900">
-                  {formatPrice(product.price)}
+                  {mounted ? formatPrice(product.price) : "..."}
                 </span>
               </div>
               <div className="flex items-center gap-1 mt-1">

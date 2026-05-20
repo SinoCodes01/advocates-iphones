@@ -117,40 +117,40 @@ export function Header() {
         </div>
 
         {/* Mobile menu */}
-        {isMobileMenuOpen && (
-          <nav className="md:hidden py-4 border-t border-gray-100 mt-4">
-            <div className="flex flex-col gap-4">
-              <Link
-                href="/"
-                className="text-gray-700 hover:text-navy-700 font-medium transition-colors"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                Home
-              </Link>
-              <Link
-                href="/shop"
-                className="text-gray-700 hover:text-navy-700 font-medium transition-colors"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                Shop
-              </Link>
-              <Link
-                href="/shop?condition=refurbished"
-                className="text-gray-700 hover:text-navy-700 font-medium transition-colors"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                Refurbished
-              </Link>
-              <Link
-                href="/contact"
-                className="text-gray-700 hover:text-navy-700 font-medium transition-colors"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                Contact
-              </Link>
-            </div>
+        <div 
+          className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${isMobileMenuOpen ? 'max-h-60 opacity-100 py-4 border-t border-gray-100 mt-4' : 'max-h-0 opacity-0'}`}
+        >
+          <nav className="flex flex-col gap-4">
+            <Link
+              href="/"
+              className="text-gray-700 hover:text-navy-700 font-medium transition-colors p-2"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Home
+            </Link>
+            <Link
+              href="/shop"
+              className="text-gray-700 hover:text-navy-700 font-medium transition-colors p-2"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Shop
+            </Link>
+            <Link
+              href="/shop?condition=refurbished"
+              className="text-gray-700 hover:text-navy-700 font-medium transition-colors p-2"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Refurbished
+            </Link>
+            <Link
+              href="/contact"
+              className="text-gray-700 hover:text-navy-700 font-medium transition-colors p-2"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Contact
+            </Link>
           </nav>
-        )}
+        </div>
       </div>
     </header>
   );
