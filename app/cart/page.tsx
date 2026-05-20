@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useCartStore } from "@/store/cart";
@@ -10,8 +10,22 @@ import { Card, CardContent, CardHeader } from "@/components/ui/Card";
 import { Trash2, Plus, Minus, ArrowRight, ShoppingBag } from "lucide-react";
 
 export default function CartPage() {
+  const [mounted, setMounted] = useState(false);
   const { items, updateQuantity, removeItem, getSubtotal } = useCartStore();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const subtotal = getSubtotal();
+
+  if (!mounted) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-navy-700"></div>
+      </div>
+    );
+  }
 
   if (items.length === 0) {
     return (
@@ -24,7 +38,7 @@ export default function CartPage() {
             Your cart is empty
           </h1>
           <p className="text-gray-600 mb-8 max-w-md mx-auto">
-            Looks like you haven't added any iPhones to your cart yet. Browse
+            Looks like you haven&apos;t added any iPhones to your cart yet. Browse
             our collection and find your perfect device.
           </p>
           <Link href="/shop">

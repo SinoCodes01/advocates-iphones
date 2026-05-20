@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -13,6 +13,7 @@ import { mockOrders } from "@/lib/mock-data";
 
 export default function CheckoutPage() {
   const router = useRouter();
+  const [mounted, setMounted] = useState(false);
   const { items, getSubtotal, clearCart } = useCartStore();
   const [step, setStep] = useState<"info" | "review" | "confirmation">("info");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -27,8 +28,20 @@ export default function CheckoutPage() {
     notes: "",
   });
 
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const subtotal = getSubtotal();
   const deliveryFee = 0; // Free delivery for MVP
+
+  if (!mounted) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-navy-700"></div>
+      </div>
+    );
+  }
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>

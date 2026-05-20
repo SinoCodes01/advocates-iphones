@@ -2,12 +2,18 @@
 
 import Link from "next/link";
 import { ShoppingBag, Menu, X, MapPin, Phone } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useCartStore } from "@/store/cart";
 
 export function Header() {
+  const [mounted, setMounted] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { toggleCart, getItemCount } = useCartStore();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const itemCount = getItemCount();
 
   return (
@@ -66,13 +72,7 @@ export function Header() {
               Refurbished
             </Link>
             <Link
-              href="#warranty"
-              className="text-gray-700 hover:text-navy-700 font-medium transition-colors"
-            >
-              Warranty
-            </Link>
-            <Link
-              href="#contact"
+              href="/contact"
               className="text-gray-700 hover:text-navy-700 font-medium transition-colors"
             >
               Contact
@@ -87,7 +87,7 @@ export function Header() {
               aria-label="Open cart"
             >
               <ShoppingBag className="w-6 h-6 text-gray-700" />
-              {itemCount > 0 && (
+              {mounted && itemCount > 0 && (
                 <span className="absolute -top-1 -right-1 w-5 h-5 bg-brand-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
                   {itemCount}
                 </span>
@@ -135,14 +135,7 @@ export function Header() {
                 Refurbished
               </Link>
               <Link
-                href="#warranty"
-                className="text-gray-700 hover:text-navy-700 font-medium transition-colors"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                Warranty
-              </Link>
-              <Link
-                href="#contact"
+                href="/contact"
                 className="text-gray-700 hover:text-navy-700 font-medium transition-colors"
                 onClick={() => setIsMobileMenuOpen(false)}
               >

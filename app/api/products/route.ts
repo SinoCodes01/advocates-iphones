@@ -5,8 +5,11 @@ export async function GET(request: Request) {
   try {
     const supabase = createClient();
     const { searchParams } = new URL(request.url);
-    const category = searchParams.get("category");
-    const condition = searchParams.get("condition");
+    const category = searchParams.get("category"); // Can be comma-separated
+    const condition = searchParams.get("condition"); // Can be comma-separated
+    const storage = searchParams.get("storage"); // Can be comma-separated
+    const minPrice = searchParams.get("minPrice");
+    const maxPrice = searchParams.get("maxPrice");
     const search = searchParams.get("search");
     const featured = searchParams.get("featured");
     const slug = searchParams.get("slug");
@@ -28,12 +31,30 @@ export async function GET(request: Request) {
       query = query.eq("slug", slug);
     }
 
+    // Handle multi-select for category
     if (category && category !== "All") {
-      query = query.eq("category", category);
+      const categories = category.split(",");
+      query = query.in("category", categories);
     }
 
-    if (condition) {
-      query = query.eq("condition", condition);
+    // Handle multi-select for condition
+    if (condition && condition !== "All") {
+      const conditions = condition.split(",");
+      query = query.in("condition", conditions);
+    }
+
+    // Handle multi-select for storage
+    if (storage) {
+      const storageSizes = storage.split(",");
+      query = query.in("storage", storageSizes);
+    }
+
+    // Handle price range
+    if (minPrice) {
+      query = query.gte("price", parseFloat(minPrice));
+    }
+    if (maxPrice) {
+      query = query.lte("price", parseFloat(maxPrice));
     }
 
     if (featured === "true") {
@@ -41,7 +62,8 @@ export async function GET(request: Request) {
     }
 
     if (search) {
-      query = query.ilike("name", `%${search}%`);
+      // Search in name, description, storage, and color
+      query = query.or(`name.ilike.%${search}%,description.ilike.%${search}%,storage.ilike.%${search}%,color.ilike.%${search}%`);
     }
 
     const { data, error } = await query;

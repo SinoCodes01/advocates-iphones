@@ -133,24 +133,24 @@ export function Footer() {
             <h3 className="font-semibold mb-4">Help</h3>
             <ul className="space-y-2">
               <li>
-                <a href="#warranty" className="text-gray-400 hover:text-brand-400 transition-colors">
+                <Link href="/help/warranty" className="text-gray-400 hover:text-brand-400 transition-colors">
                   Warranty Policy
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#delivery" className="text-gray-400 hover:text-brand-400 transition-colors">
+                <Link href="/help/delivery" className="text-gray-400 hover:text-brand-400 transition-colors">
                   Delivery Info
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#returns" className="text-gray-400 hover:text-brand-400 transition-colors">
+                <Link href="/help/returns" className="text-gray-400 hover:text-brand-400 transition-colors">
                   Returns & Refunds
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#faq" className="text-gray-400 hover:text-brand-400 transition-colors">
+                <Link href="/help/faq" className="text-gray-400 hover:text-brand-400 transition-colors">
                   FAQ
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
@@ -183,12 +183,12 @@ export function Footer() {
             © {new Date().getFullYear()} Advocates iPhones. All rights reserved.
           </p>
           <div className="flex gap-6 text-sm">
-            <a href="#" className="text-gray-400 hover:text-white transition-colors">
+            <Link href="/help/privacy" className="text-gray-400 hover:text-white transition-colors">
               Privacy Policy
-            </a>
-            <a href="#" className="text-gray-400 hover:text-white transition-colors">
+            </Link>
+            <Link href="/help/terms" className="text-gray-400 hover:text-white transition-colors">
               Terms of Service
-            </a>
+            </Link>
           </div>
         </div>
       </div>

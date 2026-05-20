@@ -3,12 +3,20 @@
 import { X, Plus, Minus, ShoppingBag, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
+import { useState, useEffect } from "react";
 import { useCartStore } from "@/store/cart";
 import { formatPrice, cn } from "@/lib/utils";
 
 export function CartDrawer() {
+  const [mounted, setMounted] = useState(false);
   const { items, isOpen, closeCart, updateQuantity, removeItem, getSubtotal } =
     useCartStore();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
 
   return (
     <>
