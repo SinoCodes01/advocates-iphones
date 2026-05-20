@@ -11,7 +11,7 @@ export default function DeliveryPage() {
         <h2 className="text-xl font-bold text-navy-900 mb-4">Shipping Methods & Times</h2>
         <div className="grid md:grid-cols-2 gap-6">
           <div className="p-6 border border-gray-100 rounded-xl bg-gray-50">
-            <h3 className="font-bold text-navy-900 mb-2">Cape Town & Surrounds</h3>
+            <h3 className="font-bold text-navy-900 mb-2">KuGompo City & Surrounds</h3>
             <p className="text-sm text-gray-600">Same-day or next-day delivery. Delivery fee: R100.</p>
           </div>
           <div className="p-6 border border-gray-100 rounded-xl bg-gray-50">

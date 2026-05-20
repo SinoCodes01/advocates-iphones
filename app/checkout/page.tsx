@@ -251,8 +251,7 @@ export default function CheckoutPage() {
                         onChange={handleInputChange}
                         rows={3}
                         className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500 resize-none"
-                        placeholder="123 Main Street, Cape Town, 8001"
-                      />
+                        placeholder="123 Main Street, KuGompo City, 8001"                      />
                     </div>
 
                     <div>

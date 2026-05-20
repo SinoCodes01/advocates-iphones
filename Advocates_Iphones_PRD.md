@@ -149,7 +149,7 @@ The visual identity should feel premium, minimal, trustworthy, and Apple-inspire
 
 - Every product page must show authenticity and service reassurance copy.
 
-- Homepage must clearly state the store location and delivery availability.
+- Homepage must clearly state the store location (KuGompo City, Eastern Cape) and delivery availability.
 
 - Policies must be written in plain language and kept visible.
 

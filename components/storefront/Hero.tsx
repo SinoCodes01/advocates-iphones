@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/Button";
-import { Shield, MessageCircle, ShoppingBag, CheckCircle2 } from "lucide-react";
+import { Shield, MessageCircle, ShoppingBag, CheckCircle2, Phone } from "lucide-react";
 
 export function Hero() {
   return (
@@ -101,30 +101,37 @@ export function Hero() {
                 <div className="absolute w-[60%] h-[60%] border border-brand-500/30 rounded-full shadow-[inset_0_0_50px_rgba(0,127,255,0.05)]" />
               </div>
 
-              {/* iPhone Image Placeholder / Illustration */}
+              {/* iPhone Illustration */}
               <div className="relative z-10 flex items-center justify-center h-full group">
-                <div className="relative w-64 h-[520px] bg-white rounded-[3rem] shadow-2xl border-8 border-gray-100 p-2 transform rotate-3 transition-transform group-hover:rotate-0 duration-500">
-                  <div className="w-full h-full bg-navy-900 rounded-[2.5rem] flex items-center justify-center overflow-hidden">
-                    <div className="relative w-full h-full opacity-40">
-                       <Image 
+                {/* Main iPhone device */}
+                <div className="relative w-64 h-[520px] bg-white rounded-[3rem] shadow-xl border-4 border-gray-200 p-4 transform rotate-3 transition-transform group-hover:rotate-0 duration-500">
+                  {/* iPhone notch */}
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-28 h-4 bg-black rounded-b-xl z-20"></div>
+
+                  {/* iPhone screen */}
+                  <div className="w-full h-full bg-white rounded-[2rem] overflow-hidden relative">
+                    {/* Screen content with simplified branding */}
+                    <div className="absolute inset-0 flex flex-col items-center justify-center p-6">
+                      {/* Centered logo with premium sizing */}
+                      <Image
                         src="/images/advocates-logo.png"
-                        alt="Watermark"
-                        fill
-                        className="object-contain p-12 brightness-0 invert"
-                       />
-                    </div>
-                    <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center">
-                      <div className="w-16 h-16 bg-brand-500 rounded-2xl flex items-center justify-center mb-4 shadow-[0_0_20px_rgba(0,127,255,0.5)]">
-                        <ShoppingBag className="w-8 h-8 text-white" />
+                        alt="Advocates iPhones Logo"
+                        width={120}
+                        height={120}
+                        priority
+                        className="object-contain mb-4"
+                      />
+                      {/* Business name underneath */}
+                      <div className="text-center">
+                        <h3 className="text-xl font-bold text-navy-900">Advocates</h3>
+                        <p className="text-brand-500 text-sm tracking-widest uppercase">iPhones</p>
                       </div>
-                      <p className="text-white font-bold text-xl uppercase tracking-tighter italic">Advocates</p>
-                      <p className="text-brand-400 font-bold text-sm tracking-[0.3em] -mt-1 uppercase">iPhones</p>
                     </div>
                   </div>
                 </div>
-                {/* Secondary iPhone hint */}
-                <div className="absolute w-56 h-[460px] bg-gray-200 rounded-[2.5rem] shadow-xl border-4 border-white -translate-x-32 translate-y-12 -rotate-6 z-0 opacity-80" />
-              </div>
+
+                {/* Secondary iPhone (shadow effect) */}
+                              </div>
             </div>
           </div>
         </div>

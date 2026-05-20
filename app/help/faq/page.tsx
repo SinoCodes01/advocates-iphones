@@ -18,11 +18,11 @@ export default function FAQPage() {
     },
     {
       q: "Where are you located?",
-      a: "We are based in Cape Town, South Africa, but we deliver nationwide to all major cities and regional areas.",
+      a: "We are based in KuGompo City, South Africa, but we deliver nationwide to all major cities and regional areas.",
     },
     {
       q: "Can I collect my order?",
-      a: "Yes, local collection in Cape Town can be arranged by appointment once payment has been confirmed.",
+      a: "Yes, local collection in KuGompo City can be arranged by appointment once payment has been confirmed.",
     },
   ];
 

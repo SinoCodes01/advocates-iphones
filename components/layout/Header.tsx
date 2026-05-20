@@ -25,7 +25,7 @@ export function Header() {
           <div className="flex items-center gap-4">
             <span className="flex items-center gap-1">
               <MapPin className="w-4 h-4 text-brand-400" />
-              Cape Town, South Africa
+              KuGompo City, South Africa
             </span>
             <span className="flex items-center gap-1">
               <Phone className="w-4 h-4 text-brand-400" />

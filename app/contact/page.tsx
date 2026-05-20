@@ -45,7 +45,7 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <p className="font-bold text-navy-900">Location</p>
-                      <p className="text-gray-600">Cape Town, South Africa</p>
+                      <p className="text-gray-600">KuGompo City, Eastern Cape, South Africa</p>
                     </div>
                   </div>
 

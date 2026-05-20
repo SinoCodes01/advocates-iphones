@@ -158,7 +158,7 @@ export function Footer() {
             <ul className="space-y-3">
               <li className="flex items-center gap-3 text-gray-400">
                 <MapPin className="w-5 h-5 text-brand-400" />
-                <span>Cape Town, South Africa</span>
+                <span>KuGompo City, South Africa</span>
               </li>
               <li className="flex items-center gap-3 text-gray-400">
                 <Phone className="w-5 h-5 text-brand-400" />

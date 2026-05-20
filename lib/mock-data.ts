@@ -172,7 +172,7 @@ export const mockOrders = [
     customerName: "Sipho M.",
     phone: "0821234567",
     email: "sipho@example.com",
-    deliveryAddress: "123 Main St, Cape Town, 8001",
+    deliveryAddress: "123 Main St, KuGompo City, 8001",
     paymentMethod: "whatsapp",
     status: "pending",
     subtotal: 24999,
