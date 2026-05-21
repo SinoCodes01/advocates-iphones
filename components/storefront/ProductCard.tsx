@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Product } from "@/lib/types";
-import { formatPrice, conditionLabel } from "@/lib/utils";
+import { formatPrice, conditionLabel, calculateDiscountPercentage } from "@/lib/utils";
 import { ConditionBadge, StockBadge } from "@/components/ui/Badge";
 import { Shield, Battery, ShoppingBag } from "lucide-react";
 
@@ -17,7 +17,8 @@ export function ProductCard({ product }: ProductCardProps) {
 
   useEffect(() => {
     setMounted(true);
-  }, []);
+    console.log("DEBUG: ProductCard", { name: product.name, price: product.price, compareAtPrice: product.compareAtPrice });
+  }, [product]);
 
   return (
     <Link href={`/product/${product.slug}`} className="block h-full group">
@@ -40,6 +41,11 @@ export function ProductCard({ product }: ProductCardProps) {
           {/* Top Badges */}
           <div className="absolute top-4 left-4 flex flex-col gap-2 z-10">
             <ConditionBadge condition={product.condition} />
+            {product.compareAtPrice != null && Number(product.compareAtPrice) > 0 && Number(product.compareAtPrice) > product.price && (
+              <span className="bg-brand-500 text-white text-[10px] font-black px-2 py-1 rounded-lg uppercase tracking-wider">
+                -{calculateDiscountPercentage(product.price, Number(product.compareAtPrice))}% OFF
+              </span>
+            )}
           </div>
 
           {/* Stock Status */}
@@ -82,6 +88,11 @@ export function ProductCard({ product }: ProductCardProps) {
                 <span className="text-2xl font-black text-navy-900">
                   {mounted ? formatPrice(product.price) : "..."}
                 </span>
+                {product.compareAtPrice != null && Number(product.compareAtPrice) > 0 && Number(product.compareAtPrice) > product.price && (
+                  <span className="text-sm font-bold text-gray-400 line-through decoration-gray-400">
+                    {mounted ? formatPrice(Number(product.compareAtPrice)) : "..."}
+                  </span>
+                )}
               </div>
               <div className="flex items-center gap-1 mt-1">
                 <Shield className="w-3 h-3 text-brand-500" />

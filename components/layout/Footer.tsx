@@ -5,7 +5,6 @@ import {
   Phone,
   Mail,
   Instagram,
-  Facebook,
   MessageCircle,
   Shield,
   ShoppingBag,
@@ -76,16 +75,12 @@ export function Footer() {
             </p>
             <div className="flex gap-3">
               <a
-                href="#"
+                href="https://www.instagram.com/advocates_iphones"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="w-10 h-10 bg-navy-800 hover:bg-brand-500 rounded-full flex items-center justify-center transition-colors"
               >
                 <Instagram className="w-5 h-5" />
-              </a>
-              <a
-                href="#"
-                className="w-10 h-10 bg-navy-800 hover:bg-brand-500 rounded-full flex items-center justify-center transition-colors"
-              >
-                <Facebook className="w-5 h-5" />
               </a>
               <a
                 href="https://wa.me/27735617081"

@@ -59,6 +59,11 @@ export function conditionLabel(condition: string): string {
   return labels[condition] || condition;
 }
 
+export function calculateDiscountPercentage(price: number, compareAtPrice: number): number {
+  if (compareAtPrice <= price) return 0;
+  return Math.round(((compareAtPrice - price) / compareAtPrice) * 100);
+}
+
 export function stockStatus(stock: number): {
   label: string;
   color: string;
