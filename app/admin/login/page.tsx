@@ -100,11 +100,7 @@ export default function LoginPage() {
               loading={isLoading}
               className="w-full py-4 rounded-xl text-lg"
             >
-              {isLoading ? (
-                <Loader2 className="w-6 h-6 animate-spin" />
-              ) : (
-                "Log In"
-              )}
+              Log In
             </Button>
           </form>
         </div>
