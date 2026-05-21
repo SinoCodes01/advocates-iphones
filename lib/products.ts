@@ -1,19 +1,35 @@
 import { createClient } from "./supabase-server";
 import { Product } from "./types";
 import { unstable_cache } from "next/cache";
+import { Database } from "./database.types";
+
+type DbProduct = Database["public"]["Tables"]["products"]["Row"];
 
 /**
  * Normalizes database product data to frontend Product type
  */
-function normalizeProduct(product: any): Product {
+function normalizeProduct(product: DbProduct): Product {
   return {
     ...product,
-    compareAtPrice: product.compare_at_price,
-    colorHex: product.color_hex,
-    warrantyMonths: product.warranty_months,
-    batteryHealth: product.battery_health,
-    reservedAt: product.reserved_at,
-    createdAt: product.created_at,
+    id: product.id,
+    name: product.name,
+    slug: product.slug,
+    description: product.description || undefined,
+    price: product.price,
+    compareAtPrice: product.compare_at_price || undefined,
+    availability: product.availability || "available",
+    condition: (product.condition as any) || "new",
+    storage: product.storage || undefined,
+    color: product.color || undefined,
+    colorHex: product.color_hex || undefined,
+    images: product.images || [],
+    warrantyMonths: product.warranty_months || 12,
+    batteryHealth: product.battery_health || undefined,
+    category: product.category || undefined,
+    active: !!product.active,
+    featured: !!product.featured,
+    reservedAt: product.reserved_at || undefined,
+    createdAt: product.created_at || "",
   };
 }
 

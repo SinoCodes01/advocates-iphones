@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { revalidateTag } from "next/cache";
 import { createClient } from "@/lib/supabase-server";
+import { productSchema } from "@/lib/validations";
 
 export async function GET(request: Request) {
   try {
@@ -72,7 +73,7 @@ export async function GET(request: Request) {
     if (error) throw error;
 
     // Normalize data to CamelCase for the frontend
-    const products = data.map((product: any) => ({
+    const products = data.map((product) => ({
       ...product,
       compareAtPrice: product.compare_at_price,
       colorHex: product.color_hex,
@@ -102,9 +103,19 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
+    
+    // Validate request body using Zod
+    const validation = productSchema.safeParse(body);
+    if (!validation.success) {
+      return NextResponse.json(
+        { error: "Validation failed", details: validation.error.format() },
+        { status: 400 }
+      );
+    }
+
     const { data, error } = await supabase
       .from("products")
-      .insert(body)
+      .insert(validation.data)
       .select()
       .single();
 
@@ -134,9 +145,18 @@ export async function PATCH(request: Request) {
 
     if (!id) throw new Error("Product ID is required");
 
+    // Partial validation for PATCH
+    const validation = productSchema.partial().safeParse(updates);
+    if (!validation.success) {
+      return NextResponse.json(
+        { error: "Validation failed", details: validation.error.format() },
+        { status: 400 }
+      );
+    }
+
     const { data, error } = await supabase
       .from("products")
-      .update(updates)
+      .update(validation.data)
       .eq("id", id)
       .select()
       .single();

@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import { useCartStore } from "@/store/cart";
-import { formatPrice } from "@/lib/utils";
+import { formatPrice, DEFAULT_WHATSAPP_NUMBER } from "@/lib/utils";
 import { ConditionBadge, AvailabilityBadge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Product } from "@/lib/types";
@@ -176,7 +176,7 @@ export function ProductDetailsClient({ product }: ProductDetailsClientProps) {
                 : "Sold"}
           </Button>
           <a
-            href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "27735617081"}?text=Hi Advocates iPhones! I'm interested in the ${product.name} ${product.storage || ""}. Is it still available?`}
+            href={`https://wa.me/${DEFAULT_WHATSAPP_NUMBER}?text=Hi Advocates iPhones! I'm interested in the ${product.name} ${product.storage || ""}. Is it still available?`}
             target="_blank"
             rel="noopener noreferrer"
           >

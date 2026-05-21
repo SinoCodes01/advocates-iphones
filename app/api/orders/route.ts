@@ -1,11 +1,35 @@
 import { NextResponse } from "next/server";
+import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase-server";
 import { generateOrderNumber } from "@/lib/utils";
+import { orderSchema } from "@/lib/validations";
+import { rateLimit } from "@/lib/rate-limit";
 
 export async function POST(request: Request) {
   try {
+    const headerList = headers();
+    const ip = headerList.get("x-forwarded-for") || "unknown";
+    
+    // Limit to 3 orders per 10 minutes per IP
+    if (!rateLimit(ip, 3, 10 * 60 * 1000)) {
+      return NextResponse.json(
+        { error: "Too many orders. Please try again later." },
+        { status: 429 }
+      );
+    }
+
     const supabase = createClient();
     const body = await request.json();
+    
+    // Validate request body using Zod
+    const validation = orderSchema.safeParse(body);
+    if (!validation.success) {
+      return NextResponse.json(
+        { error: "Validation failed", details: validation.error.format() },
+        { status: 400 }
+      );
+    }
+
     const {
       customerName,
       phone,
@@ -17,15 +41,7 @@ export async function POST(request: Request) {
       subtotal,
       deliveryFee,
       total,
-    } = body;
-
-    // Validate required fields
-    if (!customerName || !phone || !deliveryAddress || !items?.length) {
-      return NextResponse.json(
-        { error: "Missing required fields" },
-        { status: 400 }
-      );
-    }
+    } = validation.data;
 
     // Generate order number
     const orderNumber = generateOrderNumber();
@@ -37,10 +53,10 @@ export async function POST(request: Request) {
         order_number: orderNumber,
         customer_name: customerName,
         phone,
-        email,
+        email: email || null,
         delivery_address: deliveryAddress,
         payment_method: paymentMethod,
-        notes,
+        notes: notes || null,
         status: "pending",
         subtotal,
         delivery_fee: deliveryFee,
@@ -52,7 +68,7 @@ export async function POST(request: Request) {
     if (orderError) throw orderError;
 
     // 2. Create order items and reserve products
-    const orderItems = items.map((item: any) => ({
+    const orderItems = items.map((item) => ({
       order_id: orderData.id,
       product_id: item.product.id,
       product_name: item.product.name,
@@ -122,7 +138,7 @@ export async function GET(request: Request) {
     if (error) throw error;
 
     // Normalize data to CamelCase for the frontend
-    const orders = data.map((order: any) => ({
+    const orders = data.map((order) => ({
       ...order,
       orderNumber: order.order_number,
       customerName: order.customer_name,
@@ -130,7 +146,7 @@ export async function GET(request: Request) {
       paymentMethod: order.payment_method,
       deliveryFee: order.delivery_fee,
       createdAt: order.created_at,
-      items: order.order_items.map((item: any) => ({
+      items: order.order_items.map((item) => ({
         ...item,
         orderId: item.order_id,
         productId: item.product_id,

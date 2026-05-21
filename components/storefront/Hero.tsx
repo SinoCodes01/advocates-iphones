@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/Button";
 import { Shield, MessageCircle, ShoppingBag, CheckCircle2, Phone } from "lucide-react";
+import { DEFAULT_WHATSAPP_NUMBER } from "@/lib/utils";
 
 export function Hero() {
   return (
@@ -71,7 +72,7 @@ export function Hero() {
                 </Button>
               </Link>
               <a
-                href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "27735617081"}`}
+                href={`https://wa.me/${DEFAULT_WHATSAPP_NUMBER}`}
                 target="_blank"
                 rel="noopener noreferrer"
               >

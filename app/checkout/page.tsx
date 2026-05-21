@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useCartStore } from "@/store/cart";
-import { formatPrice, generateOrderNumber } from "@/lib/utils";
+import { formatPrice, generateOrderNumber, DEFAULT_WHATSAPP_NUMBER } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader } from "@/components/ui/Card";
 import { ChevronLeft, MessageCircle, Trash2 } from "lucide-react";
@@ -105,7 +105,7 @@ export default function CheckoutPage() {
     ? `Hi Advocates iPhones! I've just placed order ${orderNumber}.\n\n*My Order Details:*\n${items.map(i => `• ${i.product.name} x${i.quantity}`).join("\n")}\n\n*Total: ${formatPrice(total)}*\n\nCustomer Name: ${formData.customerName}\n\nPlease confirm availability and payment details. Thank you!`
     : "";
 
-  const whatsappLink = `https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "27735617081"}?text=${encodeURIComponent(whatsappMessage)}`;
+  const whatsappLink = `https://wa.me/${DEFAULT_WHATSAPP_NUMBER}?text=${encodeURIComponent(whatsappMessage)}`;
 
   if (items.length === 0 && step !== "confirmation") {
     return (
