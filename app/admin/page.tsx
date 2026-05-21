@@ -492,14 +492,26 @@ export default function AdminPage() {
                               <p className="text-sm text-gray-600 whitespace-pre-line">{order.deliveryAddress}</p>
                             </div>
                             <div>
-                              <h4 className="text-sm font-bold text-gray-700 mb-2">Order Items</h4>
+                              <h4 className="text-sm font-bold text-gray-700 mb-2">Order Summary</h4>
                               <ul className="space-y-1">
                                 {order.items?.map((item: any, i: number) => (
                                   <li key={i} className="flex justify-between text-sm">
                                     <span>{item.productName} x{item.quantity}</span>
-                                    <span>{formatPrice(item.unitPrice)}</span>
+                                    <span>{formatPrice(item.unitPrice * item.quantity)}</span>
                                   </li>
                                 ))}
+                                <li className="flex justify-between text-sm pt-2 border-t">
+                                  <span className="text-gray-500">Subtotal</span>
+                                  <span>{formatPrice(order.subtotal)}</span>
+                                </li>
+                                <li className="flex justify-between text-sm">
+                                  <span className="text-gray-500">Delivery Fee</span>
+                                  <span>{formatPrice(order.deliveryFee)}</span>
+                                </li>
+                                <li className="flex justify-between font-bold pt-1">
+                                  <span>Total</span>
+                                  <span>{formatPrice(order.total)}</span>
+                                </li>
                               </ul>
                             </div>
                           </div>

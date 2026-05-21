@@ -15,6 +15,7 @@ export async function POST(request: Request) {
       notes,
       items,
       subtotal,
+      deliveryFee,
       total,
     } = body;
 
@@ -42,6 +43,7 @@ export async function POST(request: Request) {
         notes,
         status: "pending",
         subtotal,
+        delivery_fee: deliveryFee,
         total,
       })
       .select()

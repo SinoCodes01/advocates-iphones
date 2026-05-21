@@ -28,14 +28,24 @@ export default function CheckoutPage() {
     deliveryAddress: "",
     paymentMethod: "whatsapp" as "whatsapp" | "eft" | "cod",
     notes: "",
+    deliveryOptionId: "local",
   });
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
+  const DELIVERY_OPTIONS = [
+    { id: "collection", label: "Collect in Store (KuGompo City)", price: 0 },
+    { id: "local", label: "KuGompo City & Surrounds", price: 100 },
+    { id: "major", label: "Major Cities (JHB, DBN, PTA)", price: 150 },
+    { id: "regional", label: "Regional Areas", price: 200 },
+  ];
+
   const subtotal = getSubtotal();
-  const deliveryFee = 0; // Free delivery for MVP
+  const selectedDelivery = DELIVERY_OPTIONS.find(opt => opt.id === formData.deliveryOptionId) || DELIVERY_OPTIONS[0];
+  const deliveryFee = selectedDelivery.price;
+  const total = subtotal + deliveryFee;
 
   if (!mounted) {
     return (
@@ -68,7 +78,8 @@ export default function CheckoutPage() {
           ...formData,
           items,
           subtotal,
-          total: subtotal + deliveryFee,
+          deliveryFee,
+          total,
         }),
       });
 
@@ -91,7 +102,7 @@ export default function CheckoutPage() {
   };
 
   const whatsappMessage = orderNumber 
-    ? `Hi Advocates iPhones! I've just placed order ${orderNumber}.\n\n*My Order Details:*\n${items.map(i => `• ${i.product.name} x${i.quantity}`).join("\n")}\n\n*Total: ${formatPrice(subtotal + deliveryFee)}*\n\nCustomer Name: ${formData.customerName}\n\nPlease confirm availability and payment details. Thank you!`
+    ? `Hi Advocates iPhones! I've just placed order ${orderNumber}.\n\n*My Order Details:*\n${items.map(i => `• ${i.product.name} x${i.quantity}`).join("\n")}\n\n*Total: ${formatPrice(total)}*\n\nCustomer Name: ${formData.customerName}\n\nPlease confirm availability and payment details. Thank you!`
     : "";
 
   const whatsappLink = `https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "27735617081"}?text=${encodeURIComponent(whatsappMessage)}`;
@@ -119,7 +130,7 @@ export default function CheckoutPage() {
       {/* Header */}
       <div className="bg-white border-b border-gray-200">
         <div className="container mx-auto px-4 py-6">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <h1 className="text-2xl font-bold text-navy-900">Checkout</h1>
               <p className="text-gray-600">
@@ -131,7 +142,7 @@ export default function CheckoutPage() {
             {step !== "confirmation" && (
               <Link
                 href="/cart"
-                className="flex items-center gap-2 text-gray-600 hover:text-gray-900"
+                className="flex items-center gap-2 text-brand-500 hover:text-brand-600 font-medium transition-colors w-fit"
               >
                 <ChevronLeft className="w-5 h-5" />
                 Back to cart
@@ -253,7 +264,41 @@ export default function CheckoutPage() {
                         onChange={handleInputChange}
                         rows={3}
                         className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500 resize-none"
-                        placeholder="123 Main Street, KuGompo City, 8001"                      />
+                        placeholder="123 Main Street, KuGompo City, 8001"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Delivery Method *
+                      </label>
+                      <div className="space-y-3">
+                        {DELIVERY_OPTIONS.map((option) => (
+                          <label
+                            key={option.id}
+                            className={`flex items-center gap-3 p-4 border rounded-xl cursor-pointer transition-colors ${
+                              formData.deliveryOptionId === option.id
+                                ? "border-brand-500 bg-brand-50/50"
+                                : "border-gray-200 hover:border-gray-300"
+                            }`}
+                          >
+                            <input
+                              type="radio"
+                              name="deliveryOptionId"
+                              value={option.id}
+                              checked={formData.deliveryOptionId === option.id}
+                              onChange={handleInputChange}
+                              className="w-5 h-5 text-brand-500"
+                            />
+                            <div className="flex-1">
+                              <p className="font-medium text-navy-900">{option.label}</p>
+                              <p className="text-sm text-gray-600">
+                                {formatPrice(option.price)}
+                              </p>
+                            </div>
+                          </label>
+                        ))}
+                      </div>
                     </div>
 
                     <div>
@@ -488,11 +533,11 @@ export default function CheckoutPage() {
                     </div>
                     <div className="flex justify-between text-gray-600">
                       <span>Delivery</span>
-                      <span className="text-green-600">Free</span>
+                      <span>{formatPrice(deliveryFee)}</span>
                     </div>
                     <div className="flex justify-between font-bold text-lg pt-2 border-t">
                       <span>Total</span>
-                      <span>{formatPrice(subtotal)}</span>
+                      <span>{formatPrice(total)}</span>
                     </div>
                   </div>
                 </CardContent>

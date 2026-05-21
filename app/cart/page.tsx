@@ -70,10 +70,10 @@ export default function CartPage() {
           <div className="lg:col-span-2 space-y-4">
             {items.map((item) => (
               <Card key={`${item.product.id}-${item.selectedVariant}`}>
-                <CardContent className="p-6">
-                  <div className="flex gap-6">
+                <CardContent className="p-4 sm:p-6">
+                  <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
                     {/* Image */}
-                    <div className="w-32 h-32 bg-gray-100 rounded-xl overflow-hidden flex-shrink-0">
+                    <div className="w-full sm:w-32 h-48 sm:h-32 bg-gray-100 rounded-xl overflow-hidden flex-shrink-0">
                       {item.product.images[0] ? (
                         <Image
                           src={item.product.images[0]}
@@ -92,18 +92,20 @@ export default function CartPage() {
                     </div>
 
                     {/* Details */}
-                    <div className="flex-1">
-                      <div className="flex justify-between">
+                    <div className="flex-1 flex flex-col justify-between">
+                      <div className="flex justify-between items-start">
                         <div>
-                          <h3 className="font-bold text-lg text-navy-900">
+                          <h3 className="font-bold text-lg text-navy-900 leading-tight">
                             {item.product.name}
                           </h3>
-                          {item.selectedVariant && (
-                            <p className="text-gray-500">{item.selectedVariant}</p>
-                          )}
-                          {item.product.storage && (
-                            <p className="text-gray-500">{item.product.storage}</p>
-                          )}
+                          <div className="flex flex-wrap gap-2 mt-1">
+                            {item.selectedVariant && (
+                              <p className="text-sm text-gray-500">{item.selectedVariant}</p>
+                            )}
+                            {item.product.storage && (
+                              <p className="text-sm text-gray-500">{item.product.storage}</p>
+                            )}
+                          </div>
                         </div>
                         <button
                           onClick={() =>
@@ -116,9 +118,9 @@ export default function CartPage() {
                         </button>
                       </div>
 
-                      <div className="flex items-end justify-between mt-4">
+                      <div className="flex flex-col sm:flex-row sm:items-end justify-between mt-6 gap-4">
                         {/* Quantity */}
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-3 bg-gray-50 w-fit p-1 rounded-full">
                           <button
                             onClick={() =>
                               updateQuantity(
@@ -127,12 +129,12 @@ export default function CartPage() {
                                 item.selectedVariant
                               )
                             }
-                            className="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors"
+                            className="w-8 h-8 sm:w-10 sm:h-10 bg-white shadow-sm hover:bg-gray-100 rounded-full flex items-center justify-center transition-colors"
                             aria-label="Decrease quantity"
                           >
-                            <Minus className="w-5 h-5" />
+                            <Minus className="w-4 h-4 sm:w-5 sm:h-5" />
                           </button>
-                          <span className="w-10 text-center font-medium text-lg">
+                          <span className="w-8 text-center font-medium text-lg">
                             {item.quantity}
                           </span>
                           <button
@@ -143,16 +145,16 @@ export default function CartPage() {
                                 item.selectedVariant
                               )
                             }
-                            className="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors"
+                            className="w-8 h-8 sm:w-10 sm:h-10 bg-white shadow-sm hover:bg-gray-100 rounded-full flex items-center justify-center transition-colors"
                             aria-label="Increase quantity"
                           >
-                            <Plus className="w-5 h-5" />
+                            <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
                           </button>
                         </div>
 
                         {/* Price */}
-                        <div className="text-right">
-                          <p className="text-2xl font-bold text-navy-900">
+                        <div className="text-left sm:text-right">
+                          <p className="text-xl sm:text-2xl font-bold text-navy-900">
                             {formatPrice(item.product.price * item.quantity)}
                           </p>
                           {item.quantity > 1 && (
@@ -170,8 +172,8 @@ export default function CartPage() {
           </div>
 
           {/* Order summary */}
-          <div>
-            <Card className="sticky top-24">
+          <div className="relative">
+            <Card className="lg:sticky lg:top-24 mb-20 lg:mb-0">
               <CardHeader>
                 <h2 className="font-bold text-lg">Order Summary</h2>
               </CardHeader>
@@ -183,7 +185,7 @@ export default function CartPage() {
                   </div>
                   <div className="flex justify-between text-gray-600">
                     <span>Delivery</span>
-                    <span className="text-green-600">Free</span>
+                    <span className="text-sm italic">Calculated at checkout</span>
                   </div>
                   <div className="flex justify-between font-bold text-xl pt-4 border-t">
                     <span>Total</span>
@@ -191,18 +193,36 @@ export default function CartPage() {
                   </div>
                 </div>
 
-                <Link href="/checkout" className="block">
-                  <Button size="lg" className="w-full">
-                    Proceed to Checkout
-                    <ArrowRight className="w-5 h-5 ml-2" />
-                  </Button>
-                </Link>
+                <div className="hidden lg:block">
+                  <Link href="/checkout" className="block">
+                    <Button size="lg" className="w-full">
+                      Proceed to Checkout
+                      <ArrowRight className="w-5 h-5 ml-2" />
+                    </Button>
+                  </Link>
+                </div>
 
                 <p className="text-sm text-gray-500 text-center">
                   Secure checkout. Guest checkout available.
                 </p>
               </CardContent>
             </Card>
+
+            {/* Mobile sticky checkout button */}
+            <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-200 lg:hidden z-50">
+              <div className="container mx-auto">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-gray-600 font-medium">Total:</span>
+                  <span className="text-xl font-bold text-navy-900">{formatPrice(subtotal)}</span>
+                </div>
+                <Link href="/checkout" className="block">
+                  <Button size="lg" className="w-full shadow-lg">
+                    Proceed to Checkout
+                    <ArrowRight className="w-5 h-5 ml-2" />
+                  </Button>
+                </Link>
+              </div>
+            </div>
           </div>
         </div>
       </div>
