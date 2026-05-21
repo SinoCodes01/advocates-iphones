@@ -208,11 +208,15 @@ export async function PATCH(request: Request) {
     // Handle inventory status based on new order status
     if (status === "confirmed" || status === "shipped" || status === "delivered") {
       for (const item of currentOrder.order_items) {
-        await supabase.rpc("confirm_sale", { p_id: item.product_id });
+        if (item.product_id) {
+          await supabase.rpc("confirm_sale", { p_id: item.product_id });
+        }
       }
     } else if (status === "cancelled") {
       for (const item of currentOrder.order_items) {
-        await supabase.rpc("release_product", { p_id: item.product_id });
+        if (item.product_id) {
+          await supabase.rpc("release_product", { p_id: item.product_id });
+        }
       }
     }
 

@@ -24,7 +24,7 @@ export function Badge({ variant = "default", children, className }: BadgeProps) 
   );
 }
 
-export function ConditionBadge({ condition }: { condition: string }) {
+export function ConditionBadge({ condition, className }: { condition: string; className?: string }) {
   const styles =
     condition === "new"
       ? "bg-brand-500 text-white"
@@ -40,7 +40,7 @@ export function ConditionBadge({ condition }: { condition: string }) {
       : "Pre-Owned";
 
   return (
-    <span className={cn("px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest shadow-sm", styles)}>
+    <span className={cn("px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest shadow-sm", styles, className)}>
       {label}
     </span>
   );
