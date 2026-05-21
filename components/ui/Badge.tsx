@@ -46,8 +46,8 @@ export function ConditionBadge({ condition }: { condition: string }) {
   );
 }
 
-export function StockBadge({ stock }: { stock: number }) {
-  if (stock === 0) return <Badge variant="error">Out of Stock</Badge>;
-  if (stock <= 3) return <Badge variant="warning">Only {stock} left</Badge>;
-  return <Badge variant="success">In Stock</Badge>;
+export function AvailabilityBadge({ availability }: { availability: "available" | "reserved" | "sold" }) {
+  if (availability === "sold") return <Badge variant="error">Sold</Badge>;
+  if (availability === "reserved") return <Badge variant="warning">Reserved</Badge>;
+  return <Badge variant="success">Available</Badge>;
 }

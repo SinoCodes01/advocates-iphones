@@ -21,7 +21,7 @@ export function ProductForm({ product, onClose, onSuccess }: ProductFormProps) {
     slug: "",
     price: 0,
     compare_at_price: 0,
-    stock: 0,
+    availability: "available" as "available" | "reserved" | "sold",
     condition: "new" as "new" | "refurbished" | "pre-owned",
     storage: "",
     color: "",
@@ -42,7 +42,7 @@ export function ProductForm({ product, onClose, onSuccess }: ProductFormProps) {
         slug: product.slug || "",
         price: product.price || 0,
         compare_at_price: (product as any).compare_at_price || product.compareAtPrice || 0,
-        stock: product.stock || 0,
+        availability: product.availability || "available",
         condition: product.condition || "new",
         storage: product.storage || "",
         color: product.color || "",
@@ -202,15 +202,18 @@ export function ProductForm({ product, onClose, onSuccess }: ProductFormProps) {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-bold text-navy-900 mb-2">
-                    Stock Level
+                    Availability Status
                   </label>
-                  <input
-                    type="number"
-                    name="stock"
-                    value={formData.stock}
+                  <select
+                    name="availability"
+                    value={formData.availability}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl"
-                  />
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl bg-white"
+                  >
+                    <option value="available">Available</option>
+                    <option value="reserved">Reserved</option>
+                    <option value="sold">Sold</option>
+                  </select>
                 </div>
                 <div>
                   <label className="block text-sm font-bold text-navy-900 mb-2">

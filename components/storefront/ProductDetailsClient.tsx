@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 import { useCartStore } from "@/store/cart";
 import { formatPrice } from "@/lib/utils";
-import { ConditionBadge, StockBadge } from "@/components/ui/Badge";
+import { ConditionBadge, AvailabilityBadge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Product } from "@/lib/types";
 import {
@@ -120,7 +120,7 @@ export function ProductDetailsClient({ product }: ProductDetailsClientProps) {
         <div>
           <div className="flex items-center gap-3 mb-3">
             <ConditionBadge condition={product.condition} />
-            <StockBadge stock={product.stock} />
+            <AvailabilityBadge availability={product.availability} />
           </div>
           <h1 className="text-3xl font-bold text-navy-900">{product.name}</h1>
           {product.storage && (
@@ -161,43 +161,19 @@ export function ProductDetailsClient({ product }: ProductDetailsClientProps) {
           </div>
         )}
 
-        {/* Quantity */}
-        <div>
-          <p className="text-sm font-medium text-gray-700 mb-2">Quantity</p>
-          <div className="flex items-center gap-4">
-            <div className="flex items-center border border-gray-200 rounded-xl overflow-hidden">
-              <button
-                onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                className="px-4 py-3 hover:bg-gray-100 transition-colors"
-              >
-                -
-              </button>
-              <span className="px-4 py-3 font-medium min-w-[60px] text-center border-x border-gray-100">
-                {quantity}
-              </span>
-              <button
-                onClick={() => setQuantity((q) => Math.min(product.stock, q + 1))}
-                className="px-4 py-3 hover:bg-gray-100 transition-colors"
-                disabled={quantity >= product.stock}
-              >
-                +
-              </button>
-            </div>
-            <span className="text-sm text-gray-500">
-              {product.stock} available
-            </span>
-          </div>
-        </div>
-
         {/* Add to cart */}
         <div className="flex flex-col sm:flex-row gap-4">
           <Button
             onClick={handleAddToCart}
             size="lg"
             className="flex-1"
-            disabled={product.stock === 0}
+            disabled={product.availability !== "available"}
           >
-            {product.stock === 0 ? "Out of Stock" : "Add to Cart"}
+            {product.availability === "available" 
+              ? "Add to Cart" 
+              : product.availability === "reserved" 
+                ? "Reserved" 
+                : "Sold"}
           </Button>
           <a
             href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "27735617081"}?text=Hi Advocates iPhones! I'm interested in the ${product.name} ${product.storage || ""}. Is it still available?`}

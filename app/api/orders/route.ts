@@ -51,7 +51,7 @@ export async function POST(request: Request) {
 
     if (orderError) throw orderError;
 
-    // 2. Create order items
+    // 2. Create order items and reserve products
     const orderItems = items.map((item: any) => ({
       order_id: orderData.id,
       product_id: item.product.id,
@@ -67,19 +67,24 @@ export async function POST(request: Request) {
 
     if (itemsError) throw itemsError;
 
-    // 3. Decrement stock (optional: could be done via RPC or separate updates)
+    // 3. Reserve products (since they are unique, quantity should be 1)
     for (const item of items) {
-      await supabase.rpc("decrement_stock", {
-        product_id: item.product.id,
-        count: item.quantity,
+      const { data: reserved, error: reserveError } = await supabase.rpc("reserve_product", {
+        p_id: item.product.id,
       });
+
+      if (reserveError || !reserved) {
+        // If reservation fails, we should ideally roll back or mark order as failed
+        // For now, we'll throw an error which will be caught below
+        throw new Error(`Product ${item.product.name} is no longer available.`);
+      }
     }
 
     return NextResponse.json({ success: true, order: orderData }, { status: 201 });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Order creation error:", error);
     return NextResponse.json(
-      { error: "Failed to create order" },
+      { error: error.message || "Failed to create order" },
       { status: 500 }
     );
   }
@@ -94,6 +99,11 @@ export async function GET(request: Request) {
     if (authError || !user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+
+    // Proactively clean up expired reservations (e.g., older than 2 hours)
+    await supabase.rpc("release_expired_reservations", {
+      expiration_interval: "2 hours",
+    });
 
     const { searchParams } = new URL(request.url);
     const status = searchParams.get("status");
@@ -161,6 +171,15 @@ export async function PATCH(request: Request) {
       );
     }
 
+    // Get the current order to see items if we need to release/confirm
+    const { data: currentOrder, error: fetchError } = await supabase
+      .from("orders")
+      .select("*, order_items(*)")
+      .eq("id", id)
+      .single();
+
+    if (fetchError) throw fetchError;
+
     const { data, error } = await supabase
       .from("orders")
       .update({ status })
@@ -169,6 +188,17 @@ export async function PATCH(request: Request) {
       .single();
 
     if (error) throw error;
+
+    // Handle inventory status based on new order status
+    if (status === "confirmed" || status === "shipped" || status === "delivered") {
+      for (const item of currentOrder.order_items) {
+        await supabase.rpc("confirm_sale", { p_id: item.product_id });
+      }
+    } else if (status === "cancelled") {
+      for (const item of currentOrder.order_items) {
+        await supabase.rpc("release_product", { p_id: item.product_id });
+      }
+    }
 
     return NextResponse.json({ success: true, order: data });
   } catch (error) {

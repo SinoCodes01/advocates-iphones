@@ -78,6 +78,7 @@ export async function GET(request: Request) {
       colorHex: product.color_hex,
       warrantyMonths: product.warranty_months,
       batteryHealth: product.battery_health,
+      reservedAt: product.reserved_at,
       createdAt: product.created_at,
     }));
 

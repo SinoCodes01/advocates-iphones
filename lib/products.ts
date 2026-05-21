@@ -12,6 +12,7 @@ function normalizeProduct(product: any): Product {
     colorHex: product.color_hex,
     warrantyMonths: product.warranty_months,
     batteryHealth: product.battery_health,
+    reservedAt: product.reserved_at,
     createdAt: product.created_at,
   };
 }
@@ -30,6 +31,7 @@ export const getProducts = unstable_cache(
     search?: string;
     featured?: boolean;
     limit?: number;
+    includeReserved?: boolean;
   } = {}) => {
     const supabase = createClient();
     let query = supabase
@@ -37,6 +39,13 @@ export const getProducts = unstable_cache(
       .select("*")
       .eq("active", true)
       .order("created_at", { ascending: false });
+
+    // Only show available products by default
+    if (!filters.includeReserved) {
+      query = query.eq("availability", "available");
+    } else {
+      query = query.in("availability", ["available", "reserved"]);
+    }
 
     if (filters.featured !== undefined) {
       query = query.eq("featured", filters.featured);

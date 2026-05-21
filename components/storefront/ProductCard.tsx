@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Product } from "@/lib/types";
 import { formatPrice, conditionLabel, calculateDiscountPercentage } from "@/lib/utils";
-import { ConditionBadge, StockBadge } from "@/components/ui/Badge";
+import { ConditionBadge, AvailabilityBadge } from "@/components/ui/Badge";
 import { Shield, Battery, ShoppingBag } from "lucide-react";
 
 interface ProductCardProps {
@@ -50,7 +50,7 @@ export function ProductCard({ product }: ProductCardProps) {
 
           {/* Stock Status */}
           <div className="absolute top-2 right-2 sm:top-4 sm:right-4 z-10 scale-90 sm:scale-100 origin-top-right">
-            <StockBadge stock={product.stock} />
+            <AvailabilityBadge availability={product.availability} />
           </div>
 
           {/* Battery Health Overlay */}
@@ -82,28 +82,28 @@ export function ProductCard({ product }: ProductCardProps) {
           </div>
 
           {/* Price & Warranty */}
-          <div className="mt-auto pt-2 sm:pt-4 flex items-end justify-between">
-            <div className="min-w-0">
-              <div className="flex flex-col sm:flex-row sm:items-baseline sm:gap-2">
-                <span className="text-base sm:text-2xl font-black text-navy-900">
-                  {mounted ? formatPrice(product.price) : "..."}
-                </span>
+          <div className="mt-auto pt-3 sm:pt-6">
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex-1 min-w-0">
                 {product.compareAtPrice != null && Number(product.compareAtPrice) > 0 && Number(product.compareAtPrice) > product.price && (
-                  <span className="text-[10px] sm:text-sm font-bold text-gray-400 line-through decoration-gray-400 truncate">
+                  <div className="text-[10px] sm:text-xs font-bold text-gray-400 line-through decoration-gray-400 mb-0.5">
                     {mounted ? formatPrice(Number(product.compareAtPrice)) : "..."}
-                  </span>
+                  </div>
                 )}
+                <div className="text-lg sm:text-2xl font-black text-navy-900 leading-none">
+                  {mounted ? formatPrice(product.price) : "..."}
+                </div>
+                <div className="flex items-center gap-1 mt-2">
+                  <Shield className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-brand-500 flex-shrink-0" />
+                  <span className="text-[8px] sm:text-[10px] font-bold text-gray-400 uppercase tracking-tight truncate">
+                    {product.warrantyMonths} Mo. Warranty
+                  </span>
+                </div>
               </div>
-              <div className="flex items-center gap-1 mt-0.5 sm:mt-1">
-                <Shield className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-brand-500 flex-shrink-0" />
-                <span className="text-[8px] sm:text-[10px] font-bold text-gray-400 uppercase tracking-tight truncate">
-                  {product.warrantyMonths} Mo. Warranty
-                </span>
+              
+              <div className="w-9 h-9 sm:w-12 sm:h-12 bg-navy-900 rounded-lg sm:rounded-2xl flex items-center justify-center group-hover:bg-brand-500 transition-all duration-300 shadow-lg shadow-navy-900/10 group-hover:shadow-brand-500/25 group-hover:-translate-y-1 flex-shrink-0">
+                <ShoppingBag className="w-4 h-4 sm:w-6 sm:h-6 text-white" />
               </div>
-            </div>
-            
-            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-navy-900 rounded-lg sm:rounded-xl flex items-center justify-center group-hover:bg-brand-500 transition-colors shadow-lg shadow-navy-900/10 group-hover:shadow-brand-500/20 flex-shrink-0 ml-2">
-              <ShoppingBag className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
             </div>
           </div>
         </div>
