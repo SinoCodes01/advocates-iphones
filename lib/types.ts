@@ -60,3 +60,9 @@ export interface CheckoutFormData {
   paymentMethod: "whatsapp" | "eft" | "cod";
   notes: string;
 }
+
+export interface ApiError {
+  message: string;
+  code: string;
+  details?: any;
+}

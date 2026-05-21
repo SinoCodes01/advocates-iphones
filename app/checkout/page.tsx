@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader } from "@/components/ui/Card";
 import { ChevronLeft, MessageCircle, Trash2 } from "lucide-react";
 import { mockOrders } from "@/lib/mock-data";
+import { useToast } from "@/components/ui/Toast";
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -18,6 +19,7 @@ export default function CheckoutPage() {
   const [step, setStep] = useState<"info" | "review" | "confirmation">("info");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderNumber, setOrderNumber] = useState("");
+  const { showToast } = useToast();
 
   const [formData, setFormData] = useState({
     customerName: "",
@@ -78,11 +80,11 @@ export default function CheckoutPage() {
         clearCart();
         setStep("confirmation");
       } else {
-        alert(data.error || "Failed to place order. Please try again.");
+        showToast(data.error || "Failed to place order. Please try again.", "error");
       }
     } catch (error) {
       console.error("Checkout error:", error);
-      alert("An unexpected error occurred. Please try again.");
+      showToast("An unexpected error occurred. Please try again.", "error");
     } finally {
       setIsSubmitting(false);
     }

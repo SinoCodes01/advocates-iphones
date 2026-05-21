@@ -5,13 +5,13 @@ import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/Button";
 import { Loader2, Lock, Mail } from "lucide-react";
-import Image from "next/image";
+import { useToast } from "@/components/ui/Toast";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { showToast } = useToast();
   const router = useRouter();
 
   // Redirect if already logged in
@@ -29,7 +29,6 @@ export default function LoginPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setError(null);
 
     try {
       if (!supabase) throw new Error("Supabase not configured");
@@ -47,7 +46,7 @@ export default function LoginPage() {
         window.location.href = "/admin";
       }
     } catch (err: any) {
-      setError(err.message || "Invalid login credentials");
+      showToast(err.message || "Invalid login credentials", "error");
       setIsLoading(false);
     }
   };
@@ -95,12 +94,6 @@ export default function LoginPage() {
                 />
               </div>
             </div>
-
-            {error && (
-              <div className="p-4 bg-red-50 text-red-600 rounded-xl text-sm font-medium">
-                {error}
-              </div>
-            )}
 
             <Button
               type="submit"
