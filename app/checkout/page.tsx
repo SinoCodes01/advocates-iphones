@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useCartStore } from "@/store/cart";
-import { formatPrice, generateOrderNumber, DEFAULT_WHATSAPP_NUMBER } from "@/lib/utils";
+import { formatPrice, generateOrderNumber, DEFAULT_WHATSAPP_NUMBER, buildWhatsAppMessage } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader } from "@/components/ui/Card";
 import { ChevronLeft, MessageCircle, Trash2 } from "lucide-react";
@@ -19,6 +19,12 @@ export default function CheckoutPage() {
   const [step, setStep] = useState<"info" | "review" | "confirmation">("info");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderNumber, setOrderNumber] = useState("");
+  const [finalOrderData, setFinalOrderData] = useState<{
+    orderNumber: string;
+    items: any[];
+    total: number;
+    deliveryFee: number;
+  } | null>(null);
   const { showToast } = useToast();
 
   const [formData, setFormData] = useState({
@@ -86,7 +92,17 @@ export default function CheckoutPage() {
       const data = await res.json();
 
       if (data.success) {
-        setOrderNumber(data.order.order_number);
+        const newOrderNumber = data.order.order_number;
+        setOrderNumber(newOrderNumber);
+        
+        // Save final order data before clearing cart
+        setFinalOrderData({
+          orderNumber: newOrderNumber,
+          items: [...items],
+          total,
+          deliveryFee
+        });
+
         // Clear cart and show confirmation
         clearCart();
         setStep("confirmation");
@@ -101,8 +117,20 @@ export default function CheckoutPage() {
     }
   };
 
-  const whatsappMessage = orderNumber 
-    ? `Hi Advocates iPhones! I've just placed order ${orderNumber}.\n\n*My Order Details:*\n${items.map(i => `• ${i.product.name} x${i.quantity}`).join("\n")}\n\n*Total: ${formatPrice(total)}*\n\nCustomer Name: ${formData.customerName}\n\nPlease confirm availability and payment details. Thank you!`
+  const whatsappMessage = finalOrderData
+    ? buildWhatsAppMessage(
+        finalOrderData.orderNumber,
+        finalOrderData.items.map(i => ({ 
+          name: i.product.name, 
+          quantity: i.quantity, 
+          price: i.product.price 
+        })),
+        finalOrderData.total,
+        finalOrderData.deliveryFee,
+        formData.customerName,
+        formData.deliveryAddress,
+        formData.paymentMethod
+      )
     : "";
 
   const whatsappLink = `https://wa.me/${DEFAULT_WHATSAPP_NUMBER}?text=${encodeURIComponent(whatsappMessage)}`;
@@ -255,16 +283,16 @@ export default function CheckoutPage() {
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Delivery Address *
+                        {formData.deliveryOptionId === "collection" ? "Collection Information (optional)" : "Delivery Address *"}
                       </label>
                       <textarea
                         name="deliveryAddress"
-                        required
+                        required={formData.deliveryOptionId !== "collection"}
                         value={formData.deliveryAddress}
                         onChange={handleInputChange}
                         rows={3}
                         className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500 resize-none"
-                        placeholder="123 Main Street, KuGompo City, 8001"
+                        placeholder={formData.deliveryOptionId === "collection" ? "Let us know when you'd like to collect..." : "123 Main Street, KuGompo City, 8001"}
                       />
                     </div>
 
@@ -481,14 +509,14 @@ export default function CheckoutPage() {
           </div>
 
           {/* Order summary */}
-          {step !== "confirmation" && (
+          {(step !== "confirmation" || finalOrderData) && (
             <div>
               <Card className="sticky top-24">
                 <CardHeader>
                   <h2 className="font-bold text-lg">Order Summary</h2>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {items.map((item) => (
+                  {(step === "confirmation" ? finalOrderData?.items : items)?.map((item) => (
                     <div key={`${item.product.id}-${item.selectedVariant}`} className="flex gap-4">
                       <div className="w-16 h-16 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
                         {item.product.images[0] ? (
@@ -529,15 +557,15 @@ export default function CheckoutPage() {
                   <div className="border-t pt-4 space-y-2">
                     <div className="flex justify-between text-gray-600">
                       <span>Subtotal</span>
-                      <span>{formatPrice(subtotal)}</span>
+                      <span>{formatPrice(step === "confirmation" ? (finalOrderData?.total || 0) - (finalOrderData?.deliveryFee || 0) : subtotal)}</span>
                     </div>
                     <div className="flex justify-between text-gray-600">
                       <span>Delivery</span>
-                      <span>{formatPrice(deliveryFee)}</span>
+                      <span>{formatPrice(step === "confirmation" ? (finalOrderData?.deliveryFee || 0) : deliveryFee)}</span>
                     </div>
                     <div className="flex justify-between font-bold text-lg pt-2 border-t">
                       <span>Total</span>
-                      <span>{formatPrice(total)}</span>
+                      <span>{formatPrice(step === "confirmation" ? (finalOrderData?.total || 0) : total)}</span>
                     </div>
                   </div>
                 </CardContent>

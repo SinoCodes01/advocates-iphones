@@ -34,22 +34,41 @@ export function buildWhatsAppMessage(
   orderNumber: string,
   items: { name: string; quantity: number; price: number }[],
   total: number,
-  customerName: string
+  deliveryFee: number,
+  customerName: string,
+  deliveryAddress: string,
+  paymentMethod: string
 ): string {
   const itemsList = items
-    .map((item) => `• ${item.name} x${item.quantity} - R${item.price}`)
+    .map((item) => `• ${item.name} x${item.quantity} - ${formatPrice(item.price * item.quantity)}`)
     .join("\n");
 
-  return `Hi Advocates iPhones! I've just placed order ${orderNumber}.
+  const paymentMethodLabel = {
+    whatsapp: "WhatsApp / EFT",
+    eft: "Direct EFT",
+    cod: "Cash on Delivery",
+  }[paymentMethod] || paymentMethod;
 
-*My Order Details:*
+  return `*ORDER CONFIRMATION - ${orderNumber}*
+
+Hi Advocates iPhones! I've just placed an order on your website.
+
+*Customer Details:*
+• Name: ${customerName}
+• Delivery: ${deliveryAddress || "Store Collection"}
+
+*Order Summary:*
 ${itemsList}
 
-*Total: R${total}*
+*Subtotal:* ${formatPrice(total - deliveryFee)}
+*Delivery:* ${formatPrice(deliveryFee)}
+*Total Amount:* ${formatPrice(total)}
 
-Customer Name: ${customerName}
+*Payment Method:* ${paymentMethodLabel}
 
-Please confirm availability and payment details. Thank you!`;
+Please confirm availability and send through the payment details so I can finalize my order. 
+
+Thank you!`;
 }
 
 export function conditionLabel(condition: string): string {
