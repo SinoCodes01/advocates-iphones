@@ -19,17 +19,17 @@ export function ProductForm({ product, onClose, onSuccess }: ProductFormProps) {
   const [formData, setFormData] = useState({
     name: "",
     slug: "",
-    price: 0,
-    compare_at_price: 0,
-    stock_quantity: 0,
+    price: "" as string | number,
+    compare_at_price: "" as string | number,
+    stock_quantity: "" as string | number,
     condition: "new" as "new" | "refurbished" | "pre-owned",
     storage: "",
     color: "",
     color_hex: "",
     category: "",
     description: "",
-    warranty_months: 12,
-    battery_health: 100,
+    warranty_months: 12 as string | number,
+    battery_health: 100 as string | number,
     active: true,
     featured: false,
     images: [] as string[],
@@ -40,9 +40,9 @@ export function ProductForm({ product, onClose, onSuccess }: ProductFormProps) {
       setFormData({
         name: product.name || "",
         slug: product.slug || "",
-        price: product.price || 0,
-        compare_at_price: (product as any).compare_at_price || product.compareAtPrice || 0,
-        stock_quantity: product.stockQuantity || (product as any).stock_quantity || 0,
+        price: product.price ?? "",
+        compare_at_price: (product as any).compare_at_price || product.compareAtPrice || "",
+        stock_quantity: product.stockQuantity ?? (product as any).stock_quantity ?? "",
         condition: product.condition || "new",
         storage: product.storage || "",
         color: product.color || "",
@@ -67,7 +67,8 @@ export function ProductForm({ product, onClose, onSuccess }: ProductFormProps) {
       const checked = (e.target as HTMLInputElement).checked;
       setFormData((prev) => ({ ...prev, [name]: checked }));
     } else if (type === "number") {
-      setFormData((prev) => ({ ...prev, [name]: parseFloat(value) || 0 }));
+      // Allow empty string for better UX while typing, otherwise parse
+      setFormData((prev) => ({ ...prev, [name]: value === "" ? "" : parseFloat(value) }));
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }));
     }
@@ -82,15 +83,29 @@ export function ProductForm({ product, onClose, onSuccess }: ProductFormProps) {
     }
   };
 
+  const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+    e.target.select();
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     setError(null);
 
     try {
+      // Ensure numerical fields are numbers, defaulting to 0 if empty
+      const submissionData = {
+        ...formData,
+        price: formData.price === "" ? 0 : Number(formData.price),
+        compare_at_price: formData.compare_at_price === "" ? 0 : Number(formData.compare_at_price),
+        stock_quantity: formData.stock_quantity === "" ? 0 : Number(formData.stock_quantity),
+        warranty_months: formData.warranty_months === "" ? 12 : Number(formData.warranty_months),
+        battery_health: formData.battery_health === "" ? 100 : Number(formData.battery_health),
+      };
+
       const url = "/api/products";
       const method = product ? "PATCH" : "POST";
-      const body = product ? { id: product.id, ...formData } : formData;
+      const body = product ? { id: product.id, ...submissionData } : submissionData;
 
       const res = await fetch(url, {
         method,
@@ -149,6 +164,7 @@ export function ProductForm({ product, onClose, onSuccess }: ProductFormProps) {
                   required
                   value={formData.name}
                   onChange={handleChange}
+                  onFocus={handleFocus}
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none"
                   placeholder="iPhone 15 Pro"
                 />
@@ -164,6 +180,7 @@ export function ProductForm({ product, onClose, onSuccess }: ProductFormProps) {
                   required
                   value={formData.slug}
                   onChange={handleChange}
+                  onFocus={handleFocus}
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl bg-gray-50 text-gray-500"
                   placeholder="iphone-15-pro"
                 />
@@ -180,7 +197,8 @@ export function ProductForm({ product, onClose, onSuccess }: ProductFormProps) {
                     required
                     value={formData.price}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl"
+                    onFocus={handleFocus}
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl no-spinner"
                     placeholder="24999"
                   />
                 </div>
@@ -193,7 +211,8 @@ export function ProductForm({ product, onClose, onSuccess }: ProductFormProps) {
                     name="compare_at_price"
                     value={formData.compare_at_price}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl"
+                    onFocus={handleFocus}
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl no-spinner"
                     placeholder="27999"
                   />
                 </div>
@@ -211,7 +230,8 @@ export function ProductForm({ product, onClose, onSuccess }: ProductFormProps) {
                     min="0"
                     value={formData.stock_quantity}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl"
+                    onFocus={handleFocus}
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl no-spinner"
                     placeholder="10"
                   />
                 </div>
@@ -241,6 +261,7 @@ export function ProductForm({ product, onClose, onSuccess }: ProductFormProps) {
                   rows={4}
                   value={formData.description}
                   onChange={handleChange}
+                  onFocus={(e) => e.target.select()}
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl resize-none"
                   placeholder="Enter product details..."
                 />
@@ -259,6 +280,7 @@ export function ProductForm({ product, onClose, onSuccess }: ProductFormProps) {
                     name="storage"
                     value={formData.storage}
                     onChange={handleChange}
+                    onFocus={handleFocus}
                     className="w-full px-4 py-3 border border-gray-200 rounded-xl"
                     placeholder="256GB"
                   />
@@ -272,6 +294,7 @@ export function ProductForm({ product, onClose, onSuccess }: ProductFormProps) {
                     name="category"
                     value={formData.category}
                     onChange={handleChange}
+                    onFocus={handleFocus}
                     className="w-full px-4 py-3 border border-gray-200 rounded-xl"
                     placeholder="iPhone 15"
                   />
@@ -288,6 +311,7 @@ export function ProductForm({ product, onClose, onSuccess }: ProductFormProps) {
                     name="color"
                     value={formData.color}
                     onChange={handleChange}
+                    onFocus={handleFocus}
                     className="w-full px-4 py-3 border border-gray-200 rounded-xl"
                     placeholder="Titanium"
                   />
@@ -302,6 +326,7 @@ export function ProductForm({ product, onClose, onSuccess }: ProductFormProps) {
                       name="color_hex"
                       value={formData.color_hex}
                       onChange={handleChange}
+                      onFocus={handleFocus}
                       className="flex-1 px-4 py-3 border border-gray-200 rounded-xl"
                       placeholder="#000000"
                     />
@@ -323,7 +348,8 @@ export function ProductForm({ product, onClose, onSuccess }: ProductFormProps) {
                     name="warranty_months"
                     value={formData.warranty_months}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl"
+                    onFocus={handleFocus}
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl no-spinner"
                   />
                 </div>
                 <div>
@@ -335,7 +361,8 @@ export function ProductForm({ product, onClose, onSuccess }: ProductFormProps) {
                     name="battery_health"
                     value={formData.battery_health}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl"
+                    onFocus={handleFocus}
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl no-spinner"
                   />
                 </div>
               </div>
