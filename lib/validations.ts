@@ -28,7 +28,7 @@ export const productSchema = z.object({
   description: z.string().optional(),
   price: z.number().min(0, "Price must be positive"),
   compare_at_price: z.number().optional(),
-  availability: z.enum(["available", "reserved", "sold"]),
+  stock_quantity: z.number().int().min(0, "Stock must be non-negative").default(0),
   condition: z.enum(["new", "refurbished", "pre-owned"]),
   storage: z.string().optional(),
   color: z.string().optional(),

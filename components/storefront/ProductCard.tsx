@@ -50,7 +50,7 @@ export function ProductCard({ product }: ProductCardProps) {
 
           {/* Stock Status */}
           <div className="absolute top-2 right-2 sm:top-4 sm:right-4 z-10 scale-90 sm:scale-100 origin-top-right">
-            <AvailabilityBadge availability={product.availability} />
+            <AvailabilityBadge stock={product.stockQuantity} />
           </div>
 
           {/* Battery Health Overlay */}

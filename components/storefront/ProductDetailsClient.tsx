@@ -120,7 +120,7 @@ export function ProductDetailsClient({ product }: ProductDetailsClientProps) {
         <div>
           <div className="flex items-center gap-3 mb-3">
             <ConditionBadge condition={product.condition} />
-            <AvailabilityBadge availability={product.availability} />
+            <AvailabilityBadge stock={product.stockQuantity} />
           </div>
           <h1 className="text-3xl font-bold text-navy-900">{product.name}</h1>
           {product.storage && (
@@ -167,13 +167,9 @@ export function ProductDetailsClient({ product }: ProductDetailsClientProps) {
             onClick={handleAddToCart}
             size="lg"
             className="flex-1"
-            disabled={product.availability !== "available"}
+            disabled={product.stockQuantity <= 0}
           >
-            {product.availability === "available" 
-              ? "Add to Cart" 
-              : product.availability === "reserved" 
-                ? "Reserved" 
-                : "Sold"}
+            {product.stockQuantity > 0 ? "Add to Cart" : "Out of Stock"}
           </Button>
           <a
             href={`https://wa.me/${DEFAULT_WHATSAPP_NUMBER}?text=Hi Advocates iPhones! I'm interested in the ${product.name} ${product.storage || ""}. Is it still available?`}

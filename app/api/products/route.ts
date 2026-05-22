@@ -76,10 +76,10 @@ export async function GET(request: Request) {
     const products = data.map((product) => ({
       ...product,
       compareAtPrice: product.compare_at_price,
+      stockQuantity: product.stock_quantity,
       colorHex: product.color_hex,
       warrantyMonths: product.warranty_months,
       batteryHealth: product.battery_health,
-      reservedAt: product.reserved_at,
       createdAt: product.created_at,
     }));
 
@@ -120,6 +120,8 @@ export async function POST(request: Request) {
       .single();
 
     if (error) throw error;
+
+    revalidateTag("products");
 
     return NextResponse.json({ success: true, product: data }, { status: 201 });
   } catch (error: any) {
@@ -162,6 +164,8 @@ export async function PATCH(request: Request) {
       .single();
 
     if (error) throw error;
+
+    revalidateTag("products");
 
     return NextResponse.json({ success: true, product: data });
   } catch (error: any) {

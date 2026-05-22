@@ -83,17 +83,28 @@ export async function POST(request: Request) {
 
     if (itemsError) throw itemsError;
 
-    // 3. Reserve products (since they are unique, quantity should be 1)
+    // 3. Check stock and decrement quantity
     for (const item of items) {
-      const { data: reserved, error: reserveError } = await supabase.rpc("reserve_product", {
-        p_id: item.product.id,
-      });
+      const { data: product, error: stockError } = await supabase
+        .from("products")
+        .select("stock_quantity, name")
+        .eq("id", item.product.id)
+        .single();
 
-      if (reserveError || !reserved) {
-        // If reservation fails, we should ideally roll back or mark order as failed
-        // For now, we'll throw an error which will be caught below
-        throw new Error(`Product ${item.product.name} is no longer available.`);
+      if (stockError || !product) {
+        throw new Error(`Product ${item.product.name} not found.`);
       }
+
+      if (product.stock_quantity < item.quantity) {
+        throw new Error(`Insufficient stock for ${product.name}. Only ${product.stock_quantity} available.`);
+      }
+
+      const { error: updateError } = await supabase
+        .from("products")
+        .update({ stock_quantity: product.stock_quantity - item.quantity })
+        .eq("id", item.product.id);
+
+      if (updateError) throw updateError;
     }
 
     return NextResponse.json({ success: true, order: orderData }, { status: 201 });
@@ -115,11 +126,6 @@ export async function GET(request: Request) {
     if (authError || !user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-
-    // Proactively clean up expired reservations (e.g., older than 2 hours)
-    await supabase.rpc("release_expired_reservations", {
-      expiration_interval: "2 hours",
-    });
 
     const { searchParams } = new URL(request.url);
     const status = searchParams.get("status");
@@ -206,16 +212,22 @@ export async function PATCH(request: Request) {
     if (error) throw error;
 
     // Handle inventory status based on new order status
-    if (status === "confirmed" || status === "shipped" || status === "delivered") {
+    if (status === "cancelled" && currentOrder.status !== "cancelled") {
+      // Restore stock if the order was not already cancelled
       for (const item of currentOrder.order_items) {
         if (item.product_id) {
-          await supabase.rpc("confirm_sale", { p_id: item.product_id });
-        }
-      }
-    } else if (status === "cancelled") {
-      for (const item of currentOrder.order_items) {
-        if (item.product_id) {
-          await supabase.rpc("release_product", { p_id: item.product_id });
+          const { data: product } = await supabase
+            .from("products")
+            .select("stock_quantity")
+            .eq("id", item.product_id)
+            .single();
+            
+          if (product) {
+            await supabase
+              .from("products")
+              .update({ stock_quantity: product.stock_quantity + item.quantity })
+              .eq("id", item.product_id);
+          }
         }
       }
     }

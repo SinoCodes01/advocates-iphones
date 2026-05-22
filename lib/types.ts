@@ -5,8 +5,7 @@ export interface Product {
   description?: string;
   price: number;
   compareAtPrice?: number;
-  availability: "available" | "reserved" | "sold";
-  reservedAt?: string;
+  stockQuantity: number;
   condition: "new" | "refurbished" | "pre-owned";
   storage?: string;
   color?: string;
