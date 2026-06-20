@@ -408,7 +408,7 @@ export default function AdminPage() {
                             </td>
                             <td className="px-6 py-4">{formatPrice(product.price)}</td>
                             <td className="px-6 py-4">
-                              <span className={product.availability === "sold" ? "text-red-500" : "text-gray-700"}>{product.availability}</span>
+                              <span className={product.stockQuantity === 0 ? "text-red-500" : "text-gray-700"}>{product.stockQuantity > 0 ? `${product.stockQuantity} in stock` : "Out of stock"}</span>
                             </td>
                             <td className="px-6 py-4">
                               <button

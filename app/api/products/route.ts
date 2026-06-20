@@ -76,7 +76,7 @@ export async function GET(request: Request) {
     const products = data.map((product) => ({
       ...product,
       compareAtPrice: product.compare_at_price,
-      stockQuantity: product.stock_quantity,
+      stockQuantity: product.stock,
       colorHex: product.color_hex,
       warrantyMonths: product.warranty_months,
       batteryHealth: product.battery_health,
