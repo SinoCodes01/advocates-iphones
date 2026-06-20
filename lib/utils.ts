@@ -66,7 +66,7 @@ ${itemsList}
 
 *Payment Method:* ${paymentMethodLabel}
 
-Please confirm availability and send through the payment details so I can finalize my order. 
+Please confirm stock and send through the payment details so I can finalize my order. 
 
 Thank you!`;
 }

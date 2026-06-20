@@ -108,9 +108,6 @@ export type Database = {
       products: {
         Row: {
           active: boolean | null
-          availability:
-            | Database["public"]["Enums"]["product_availability"]
-            | null
           battery_health: number | null
           category: string | null
           color: string | null
@@ -124,16 +121,13 @@ export type Database = {
           images: string[] | null
           name: string
           price: number
-          reserved_at: string | null
           slug: string
           storage: string | null
+          stock_quantity: number
           warranty_months: number | null
         }
         Insert: {
           active?: boolean | null
-          availability?:
-            | Database["public"]["Enums"]["product_availability"]
-            | null
           battery_health?: number | null
           category?: string | null
           color?: string | null
@@ -147,16 +141,13 @@ export type Database = {
           images?: string[] | null
           name: string
           price: number
-          reserved_at?: string | null
           slug: string
+          stock_quantity?: number
           storage?: string | null
           warranty_months?: number | null
         }
         Update: {
           active?: boolean | null
-          availability?:
-            | Database["public"]["Enums"]["product_availability"]
-            | null
           battery_health?: number | null
           category?: string | null
           color?: string | null
@@ -170,8 +161,8 @@ export type Database = {
           images?: string[] | null
           name?: string
           price?: number
-          reserved_at?: string | null
           slug?: string
+          stock_quantity?: number
           storage?: string | null
           warranty_months?: number | null
         }
@@ -182,19 +173,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      confirm_sale: { Args: { p_id: string }; Returns: undefined }
-      release_expired_reservations: {
-        Args: { expiration_interval?: string }
-        Returns: {
-          order_id: string
-          product_id: string
-        }[]
-      }
-      release_product: { Args: { p_id: string }; Returns: undefined }
-      reserve_product: { Args: { p_id: string }; Returns: boolean }
+      [_ in never]: never
     }
     Enums: {
-      product_availability: "available" | "reserved" | "sold"
+      [_ in never]: never
     }
     CompositeTypes: {
       [_ in never]: never

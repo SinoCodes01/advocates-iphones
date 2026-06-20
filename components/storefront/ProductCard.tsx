@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Product } from "@/lib/types";
 import { formatPrice, conditionLabel, calculateDiscountPercentage } from "@/lib/utils";
-import { ConditionBadge, AvailabilityBadge } from "@/components/ui/Badge";
+import { ConditionBadge, StockBadge } from "@/components/ui/Badge";
 import { Shield, Battery, ShoppingBag } from "lucide-react";
 
 interface ProductCardProps {
@@ -50,7 +50,7 @@ export function ProductCard({ product }: ProductCardProps) {
 
           {/* Stock Status */}
           <div className="absolute top-2 right-2 sm:top-4 sm:right-4 z-10 scale-90 sm:scale-100 origin-top-right">
-            <AvailabilityBadge stock={product.stockQuantity} />
+            <StockBadge stockQuantity={product.stockQuantity} />
           </div>
 
           {/* Battery Health Overlay */}

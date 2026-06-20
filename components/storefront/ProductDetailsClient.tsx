@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 import { useCartStore } from "@/store/cart";
 import { formatPrice, DEFAULT_WHATSAPP_NUMBER } from "@/lib/utils";
-import { ConditionBadge, AvailabilityBadge } from "@/components/ui/Badge";
+import { ConditionBadge, StockBadge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Product } from "@/lib/types";
 import {
@@ -120,7 +120,7 @@ export function ProductDetailsClient({ product }: ProductDetailsClientProps) {
         <div>
           <div className="flex items-center gap-3 mb-3">
             <ConditionBadge condition={product.condition} />
-            <AvailabilityBadge stock={product.stockQuantity} />
+            <StockBadge stockQuantity={product.stockQuantity} />
           </div>
           <h1 className="text-3xl font-bold text-navy-900">{product.name}</h1>
           {product.storage && (

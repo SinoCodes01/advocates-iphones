@@ -480,7 +480,7 @@ export default function CheckoutPage() {
                     <span className="font-bold text-navy-700">{orderNumber}</span>
                   </p>
                   <p className="text-gray-600 mb-8">
-                    We will contact you shortly to confirm availability and
+                    We will contact you shortly to confirm stock and
                     payment details.
                   </p>
 

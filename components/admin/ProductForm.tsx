@@ -21,7 +21,7 @@ export function ProductForm({ product, onClose, onSuccess }: ProductFormProps) {
     slug: "",
     price: "" as string | number,
     compare_at_price: "" as string | number,
-    stock_quantity: "" as string | number,
+    stock_quantity: 0 as string | number,
     condition: "new" as "new" | "refurbished" | "pre-owned",
     storage: "",
     color: "",
@@ -42,7 +42,7 @@ export function ProductForm({ product, onClose, onSuccess }: ProductFormProps) {
         slug: product.slug || "",
         price: product.price ?? "",
         compare_at_price: (product as any).compare_at_price || product.compareAtPrice || "",
-        stock_quantity: product.stockQuantity ?? (product as any).stock_quantity ?? "",
+        stock_quantity: (product as any).stock_quantity || product.stockQuantity || 0,
         condition: product.condition || "new",
         storage: product.storage || "",
         color: product.color || "",
@@ -227,7 +227,6 @@ export function ProductForm({ product, onClose, onSuccess }: ProductFormProps) {
                     type="number"
                     name="stock_quantity"
                     required
-                    min="0"
                     value={formData.stock_quantity}
                     onChange={handleChange}
                     onFocus={handleFocus}

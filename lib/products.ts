@@ -17,7 +17,7 @@ function normalizeProduct(product: DbProduct): Product {
     description: product.description || undefined,
     price: product.price,
     compareAtPrice: product.compare_at_price || undefined,
-    stockQuantity: (product as any).stock_quantity || 0,
+    stockQuantity: (product as any).stock_quantity || product.stock_quantity || 0,
     condition: (product.condition as any) || "new",
     storage: product.storage || undefined,
     color: product.color || undefined,

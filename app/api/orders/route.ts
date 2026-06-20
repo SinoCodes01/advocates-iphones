@@ -87,7 +87,7 @@ export async function POST(request: Request) {
     for (const item of items) {
       const { data: product, error: stockError } = await supabase
         .from("products")
-        .select("stock, name")
+        .select("stock_quantity, name")
         .eq("id", item.product.id)
         .single();
 
@@ -95,13 +95,13 @@ export async function POST(request: Request) {
         throw new Error(`Product ${item.product.name} not found.`);
       }
 
-      if (product.stock < item.quantity) {
-        throw new Error(`Insufficient stock for ${product.name}. Only ${product.stock} available.`);
+      if (product.stock_quantity < item.quantity) {
+        throw new Error(`Product ${product.name} has insufficient stock.`);
       }
 
       const { error: updateError } = await supabase
         .from("products")
-        .update({ stock: product.stock - item.quantity })
+        .update({ stock_quantity: product.stock_quantity - item.quantity })
         .eq("id", item.product.id);
 
       if (updateError) throw updateError;
@@ -218,14 +218,14 @@ export async function PATCH(request: Request) {
         if (item.product_id) {
           const { data: product } = await supabase
             .from("products")
-            .select("stock")
+            .select("stock_quantity")
             .eq("id", item.product_id)
             .single();
             
           if (product) {
             await supabase
               .from("products")
-              .update({ stock: product.stock + item.quantity })
+              .update({ stock_quantity: product.stock_quantity + item.quantity })
               .eq("id", item.product_id);
           }
         }
