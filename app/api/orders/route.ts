@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase-server";
+import { createAdminClient } from "@/lib/supabase-admin";
 import { generateOrderNumber } from "@/lib/utils";
 import { orderSchema } from "@/lib/validations";
 import { rateLimit } from "@/lib/rate-limit";
@@ -18,7 +19,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const supabase = createClient();
+    const supabase = createAdminClient();
     const body = await request.json();
     
     // Validate request body using Zod
