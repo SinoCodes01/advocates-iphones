@@ -10,7 +10,6 @@ import { Product, Order } from "@/lib/types";
 import { ProductForm } from "@/components/admin/ProductForm";
 import { OrderSlideOver } from "@/components/admin/OrderSlideOver";
 import { AdminCharts } from "@/components/admin/AdminCharts";
-import { AnimatedStatCard } from "@/components/admin/AnimatedStatCard";
 import {
   Package,
   ShoppingBag,
@@ -443,8 +442,8 @@ export default function AdminPage() {
           <div className="flex gap-1 pb-1">
             {(
               [
-                { tab: "dashboard", icon: <BarChart3 className="w-4 h-4" />, label: "Dashboard" },
-                { tab: "products", icon: <Package className="w-4 h-4" />, label: "Products" },
+                { tab: "dashboard", icon: <BarChart3 className="w-4 h-4" />, label: "Dashboard", badge: undefined },
+                { tab: "products", icon: <Package className="w-4 h-4" />, label: "Products", badge: undefined },
                 { tab: "orders", icon: <ShoppingBag className="w-4 h-4" />, label: "Orders", badge: pendingOrders },
               ] as const
             ).map(({ tab, icon, label, badge }) => (
@@ -477,37 +476,7 @@ export default function AdminPage() {
         {activeTab === "dashboard" && (
           <div className="space-y-8 animate-in fade-in duration-300">
             {/* Stat cards */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-              <AnimatedStatCard
-                label="Total Revenue"
-                value={Math.round(totalRevenue)}
-                formatAsCurrency
-                icon={<TrendingUp className="w-5 h-5 text-green-600" />}
-                iconBg="bg-green-50"
-                valueColor="text-green-700"
-              />
-              <AnimatedStatCard
-                label="Total Orders"
-                value={totalOrders}
-                icon={<ShoppingBag className="w-5 h-5 text-brand-600" />}
-                iconBg="bg-brand-50"
-              />
-              <AnimatedStatCard
-                label="Pending Orders"
-                value={pendingOrders}
-                icon={<Package className="w-5 h-5 text-amber-600" />}
-                iconBg="bg-amber-50"
-                valueColor={pendingOrders > 0 ? "text-amber-600" : "text-navy-900"}
-                subtext={pendingOrders > 0 ? "Need attention" : "All clear"}
-              />
-              <AnimatedStatCard
-                label="Avg. Order Value"
-                value={Math.round(avgOrderValue)}
-                formatAsCurrency
-                icon={<DollarSign className="w-5 h-5 text-purple-600" />}
-                iconBg="bg-purple-50"
-              />
-            </div>
+            {/* Animated stat cards removed – component retained for future use */}
 
             {/* Analytics Charts */}
             <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
