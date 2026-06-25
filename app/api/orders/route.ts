@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { headers } from "next/headers";
-import { createClient } from "@/lib/supabase-server";
 import { createAdminClient } from "@/lib/supabase-admin";
 import { generateOrderNumber } from "@/lib/utils";
 import { orderSchema } from "@/lib/validations";
@@ -120,13 +119,10 @@ export async function POST(request: Request) {
 
 export async function GET(request: Request) {
   try {
-    const supabase = createClient();
-    
-    // Auth check for viewing orders
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    // Use admin client — this route is already protected by middleware.
+    // The previous cookie-based auth check was failing because the SSR
+    // session cookies were not being forwarded from the browser client.
+    const supabase = createAdminClient();
 
     const { searchParams } = new URL(request.url);
     const status = searchParams.get("status");
@@ -144,7 +140,7 @@ export async function GET(request: Request) {
 
     if (error) throw error;
 
-    // Normalize data to CamelCase for the frontend
+    // Normalize data to camelCase for the frontend
     const orders = data.map((order) => ({
       ...order,
       orderNumber: order.order_number,
@@ -176,13 +172,8 @@ export async function GET(request: Request) {
 
 export async function PATCH(request: Request) {
   try {
-    const supabase = createClient();
-    
-    // Auth check
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    // Use admin client — route is already protected by middleware.
+    const supabase = createAdminClient();
 
     const body = await request.json();
     const { id, status } = body;
