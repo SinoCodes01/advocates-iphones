@@ -72,13 +72,7 @@ export function Header() {
             >
               Shop
             </Link>
-            <Link
-              href="/shop?condition=refurbished"
-              className="text-gray-700 hover:text-navy-700 font-medium transition-colors"
-            >
-              Refurbished
-            </Link>
-            <Link
+                        <Link
               href="/contact"
               className="text-gray-700 hover:text-navy-700 font-medium transition-colors"
             >

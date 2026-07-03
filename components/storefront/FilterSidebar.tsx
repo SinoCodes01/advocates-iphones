@@ -21,8 +21,7 @@ interface FilterSidebarProps {
 const storageOptions = ["128GB", "256GB", "512GB", "1TB"];
 const conditionOptions = [
   { label: "Brand New", value: "new" },
-  { label: "Refurbished", value: "refurbished" },
-  { label: "Pre-owned", value: "pre-owned" },
+  { label: "Pre-Owned", value: "pre-owned" },
 ];
 
 export function FilterSidebar({

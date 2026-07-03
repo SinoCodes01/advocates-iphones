@@ -6,7 +6,7 @@ export interface Product {
   price: number;
   compareAtPrice?: number;
   stockQuantity: number;
-  condition: "new" | "refurbished" | "pre-owned";
+  condition: "new" | "pre-owned";
   storage?: string;
   color?: string;
   colorHex?: string;

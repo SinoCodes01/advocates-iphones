@@ -22,7 +22,7 @@ export function ProductForm({ product, onClose, onSuccess }: ProductFormProps) {
     price: "" as string | number,
     compare_at_price: "" as string | number,
     stock_quantity: 0 as string | number,
-    condition: "new" as "new" | "refurbished" | "pre-owned",
+    condition: "new" as "new" | "pre-owned",
     storage: "",
     color: "",
     color_hex: "",
@@ -245,7 +245,6 @@ export function ProductForm({ product, onClose, onSuccess }: ProductFormProps) {
                     className="w-full px-4 py-3 border border-gray-200 rounded-xl bg-white"
                   >
                     <option value="new">Brand New</option>
-                    <option value="refurbished">Refurbished</option>
                     <option value="pre-owned">Pre-Owned</option>
                   </select>
                 </div>
