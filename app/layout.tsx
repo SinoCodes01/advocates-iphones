@@ -6,14 +6,40 @@ import { Footer } from "@/components/layout/Footer";
 import { ToastProvider } from "@/components/ui/Toast";
 
 export const metadata: Metadata = {
-  title: "Advocates iPhones | Premium iPhones & Accessories",
+  metadataBase: new URL("https://www.advocatesiphones.com"),
+  title: {
+    default: "Advocates iPhones | Premium iPhones & Accessories",
+    template: "%s | Advocates iPhones",
+  },
   description:
-    "Your trusted source for brand new and refurbished iPhones. Premium quality, authentic products, and excellent warranty.",
+    "Discover premium new and refurbished iPhones, accessories, and reliable warranty support from Advocates iPhones.",
+  keywords: [
+    "iPhones",
+    "refurbished iPhones",
+    "Apple accessories",
+    "phone accessories",
+    "premium phones",
+  ],
+  alternates: {
+    canonical: "/",
+  },
   openGraph: {
     title: "Advocates iPhones | Premium iPhones & Accessories",
     description:
-      "Your trusted source for brand new and refurbished iPhones. Shop with confidence.",
+      "Shop premium new and refurbished iPhones with trusted quality, warranty support, and fast delivery.",
+    url: "/",
     type: "website",
+    siteName: "Advocates iPhones",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Advocates iPhones | Premium iPhones & Accessories",
+    description:
+      "Shop premium new and refurbished iPhones with trusted quality, warranty support, and fast delivery.",
+  },
+  robots: {
+    index: true,
+    follow: true,
   },
 };
 
