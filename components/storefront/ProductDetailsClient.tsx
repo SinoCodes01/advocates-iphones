@@ -17,6 +17,7 @@ import {
   Check,
   MessageCircle,
 } from "lucide-react";
+import { useRealtimeProductStock } from "./useRealtimeProductStock";
 
 interface ProductDetailsClientProps {
   product: Product;
@@ -26,12 +27,19 @@ export function ProductDetailsClient({ product }: ProductDetailsClientProps) {
   const [mounted, setMounted] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
+  const [currentStockQuantity, setCurrentStockQuantity] = useState(product.stockQuantity);
 
   const { addItem, openCart } = useCartStore();
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  useEffect(() => {
+    setCurrentStockQuantity(product.stockQuantity);
+  }, [product.stockQuantity]);
+
+  useRealtimeProductStock(product.id, setCurrentStockQuantity);
 
   const handleAddToCart = () => {
     addItem(product, quantity);
@@ -120,7 +128,7 @@ export function ProductDetailsClient({ product }: ProductDetailsClientProps) {
         <div>
           <div className="flex items-center gap-3 mb-3">
             <ConditionBadge condition={product.condition} />
-            <StockBadge stockQuantity={product.stockQuantity} />
+            <StockBadge stockQuantity={currentStockQuantity} />
           </div>
           <h1 className="text-3xl font-bold text-navy-900">{product.name}</h1>
           {product.storage && (
@@ -167,9 +175,9 @@ export function ProductDetailsClient({ product }: ProductDetailsClientProps) {
             onClick={handleAddToCart}
             size="lg"
             className="flex-1"
-            disabled={product.stockQuantity <= 0}
+            disabled={currentStockQuantity <= 0}
           >
-            {product.stockQuantity > 0 ? "Add to Cart" : "Out of Stock"}
+            {currentStockQuantity > 0 ? "Add to Cart" : "Out of Stock"}
           </Button>
           <a
             href={`https://wa.me/${DEFAULT_WHATSAPP_NUMBER}?text=Hi Advocates iPhones! I'm interested in the ${product.name} ${product.storage || ""}. Is it still available?`}

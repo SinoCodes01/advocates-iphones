@@ -4,9 +4,10 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Product } from "@/lib/types";
-import { formatPrice, conditionLabel, calculateDiscountPercentage } from "@/lib/utils";
+import { formatPrice, calculateDiscountPercentage } from "@/lib/utils";
 import { ConditionBadge, StockBadge } from "@/components/ui/Badge";
 import { Shield, Battery, ShoppingBag } from "lucide-react";
+import { useRealtimeProductStock } from "./useRealtimeProductStock";
 
 interface ProductCardProps {
   product: Product;
@@ -14,11 +15,17 @@ interface ProductCardProps {
 
 export function ProductCard({ product }: ProductCardProps) {
   const [mounted, setMounted] = useState(false);
+  const [currentStockQuantity, setCurrentStockQuantity] = useState(product.stockQuantity);
 
   useEffect(() => {
     setMounted(true);
-    console.log("DEBUG: ProductCard", { name: product.name, price: product.price, compareAtPrice: product.compareAtPrice });
-  }, [product]);
+  }, []);
+
+  useEffect(() => {
+    setCurrentStockQuantity(product.stockQuantity);
+  }, [product.stockQuantity]);
+
+  useRealtimeProductStock(product.id, setCurrentStockQuantity);
 
   return (
     <Link href={`/product/${product.slug}`} className="block h-full group">
@@ -50,7 +57,7 @@ export function ProductCard({ product }: ProductCardProps) {
 
           {/* Stock Status */}
           <div className="absolute top-2 right-2 sm:top-4 sm:right-4 z-10 scale-90 sm:scale-100 origin-top-right">
-            <StockBadge stockQuantity={product.stockQuantity} />
+            <StockBadge stockQuantity={currentStockQuantity} />
           </div>
 
           {/* Battery Health Overlay */}
