@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useCartStore } from "@/store/cart";
 import { formatPrice, DEFAULT_WHATSAPP_NUMBER } from "@/lib/utils";
 import { ConditionBadge, StockBadge } from "@/components/ui/Badge";
@@ -39,7 +39,11 @@ export function ProductDetailsClient({ product }: ProductDetailsClientProps) {
     setCurrentStockQuantity(product.stockQuantity);
   }, [product.stockQuantity]);
 
-  useRealtimeProductStock(product.id, setCurrentStockQuantity);
+  const handleStockChange = useCallback((stockQuantity: number) => {
+    setCurrentStockQuantity(stockQuantity);
+  }, []);
+
+  useRealtimeProductStock(product.id, handleStockChange);
 
   const handleAddToCart = () => {
     addItem(product, quantity);

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Product } from "@/lib/types";
@@ -25,7 +25,11 @@ export function ProductCard({ product }: ProductCardProps) {
     setCurrentStockQuantity(product.stockQuantity);
   }, [product.stockQuantity]);
 
-  useRealtimeProductStock(product.id, setCurrentStockQuantity);
+  const handleStockChange = useCallback((stockQuantity: number) => {
+    setCurrentStockQuantity(stockQuantity);
+  }, []);
+
+  useRealtimeProductStock(product.id, handleStockChange);
 
   return (
     <Link href={`/product/${product.slug}`} className="block h-full group">
