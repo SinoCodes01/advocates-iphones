@@ -8,9 +8,12 @@ export function useRealtimeProductStock(
   onStockChange?: (stockQuantity: number) => void
 ) {
   useEffect(() => {
-    if (!productId || !supabase) return;
+    if (!productId || !supabase) {
+      return;
+    }
 
-    const channel = supabase.channel(`product-stock-${productId}`);
+    const client = supabase;
+    const channel = client.channel(`product-stock-${productId}`);
 
     channel
       .on(
@@ -29,7 +32,7 @@ export function useRealtimeProductStock(
       .subscribe();
 
     return () => {
-      supabase.removeChannel(channel);
+      client.removeChannel(channel);
     };
   }, [productId, onStockChange]);
 }

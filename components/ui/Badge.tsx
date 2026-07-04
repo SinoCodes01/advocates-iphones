@@ -47,6 +47,9 @@ export function ConditionBadge({ condition, className }: { condition: string; cl
 }
 
 export function StockBadge({ stockQuantity }: { stockQuantity: number }) {
-  if (stockQuantity <= 0) return <Badge variant="error" className="font-bold">Out of Stock</Badge>;
-  return <Badge variant="success" className="font-bold">{stockQuantity} in stock</Badge>;
+  if (stockQuantity <= 0) {
+    return <Badge variant="error" className="font-bold">Out of Stock</Badge>;
+  }
+
+  return null;
 }
