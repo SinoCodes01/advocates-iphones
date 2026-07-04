@@ -1,5 +1,6 @@
 import { Hero } from "@/components/storefront/Hero";
 import { ProductGrid } from "@/components/storefront/ProductGrid";
+import { SalePromoCarousel } from "@/components/storefront/SalePromoCarousel";
 import { getProducts } from "@/lib/products";
 
 export default async function HomePage() {
@@ -11,6 +12,7 @@ export default async function HomePage() {
 
   return (
     <div>
+      <SalePromoCarousel />
       <Hero />
       
       <div className="space-y-16 py-16">

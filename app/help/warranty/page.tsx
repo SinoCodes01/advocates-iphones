@@ -41,7 +41,7 @@ export default function WarrantyPage() {
       <section className="mb-10 text-brand-700 bg-brand-50 p-6 rounded-xl border border-brand-100">
         <h2 className="text-xl font-bold mb-2">How to Claim</h2>
         <p>
-          To initiate a warranty claim, please contact us via WhatsApp at <strong>073 561 7081</strong> or email <strong>warranty@advocatesiphones.co.za</strong> with your order number and a description of the issue.
+          To initiate a warranty claim, please contact us via WhatsApp at <strong>073 515 2402</strong> or email <strong>warranty@advocatesiphones.co.za</strong> with your order number and a description of the issue.
         </p>
       </section>
     </div>

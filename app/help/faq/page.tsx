@@ -43,7 +43,7 @@ export default function FAQPage() {
         <h2 className="text-xl font-bold text-navy-900 mb-4">Still have questions?</h2>
         <p className="text-gray-600 mb-6">Our team is ready to help you via WhatsApp.</p>
         <a
-          href="https://wa.me/27735617081"
+          href="https://wa.me/27735152402"
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center gap-2 bg-green-500 text-white px-8 py-3 rounded-xl font-bold hover:bg-green-600 transition-colors"

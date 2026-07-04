@@ -22,7 +22,7 @@ export default function ReturnsPage() {
       <section className="mb-10">
         <h2 className="text-xl font-bold text-navy-900 mb-4">Return Process</h2>
         <ol className="list-decimal pl-5 text-gray-600 space-y-3">
-          <li>Contact us via WhatsApp (073 561 7081) to notify us of the return.</li>
+          <li>Contact us via WhatsApp (073 515 2402) to notify us of the return.</li>
           <li>We will arrange for a courier to collect the device from you.</li>
           <li>Once we receive and inspect the device (usually within 2 business days), we will process your refund.</li>
         </ol>

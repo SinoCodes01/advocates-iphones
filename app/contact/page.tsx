@@ -25,7 +25,7 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <p className="font-bold text-navy-900">Phone & WhatsApp</p>
-                      <p className="text-gray-600">073 561 7081</p>
+                      <p className="text-gray-600">073 515 2402</p>
                     </div>
                   </div>
 
@@ -63,7 +63,7 @@ export default function ContactPage() {
               </div>
 
               <a
-                href="https://wa.me/27735617081"
+                href="https://wa.me/27735152402"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center justify-center gap-3 w-full bg-green-500 text-white py-4 rounded-2xl font-bold text-lg hover:bg-green-600 transition-colors shadow-lg shadow-green-200"

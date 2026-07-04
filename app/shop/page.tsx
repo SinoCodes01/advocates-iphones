@@ -1,3 +1,4 @@
+import { SalePromoCarousel } from "@/components/storefront/SalePromoCarousel";
 import { ShopClient } from "@/components/storefront/ShopClient";
 import { getProducts } from "@/lib/products";
 
@@ -12,6 +13,8 @@ export default async function ShopPage() {
 
   return (
     <div className="min-h-screen bg-gray-50/50">
+      <SalePromoCarousel />
+
       {/* Page Header */}
       <div className="bg-white border-b border-gray-100">
         <div className="container mx-auto px-4 py-12 md:py-16">
