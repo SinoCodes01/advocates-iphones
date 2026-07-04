@@ -181,7 +181,7 @@ User -\> Next.js app on Vercel -\> Supabase database/auth/storage
 
 - orders: id, customer_name, phone, email, delivery_address, payment_method, status, total, created_at.
 
-- order_items: id, order_id, product_id, quantity, unit_price, selected_variant.
+- order_items: id, order_id, product_id, quantity, unit_price.
 
 - users/admins: id, role, auth identity, last_login.
 

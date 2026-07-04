@@ -100,7 +100,6 @@ create table order_items (
   product_name text not null,
   quantity integer not null default 1,
   unit_price numeric not null,
-  selected_variant text,
   created_at timestamp with time zone default now()
 );
 

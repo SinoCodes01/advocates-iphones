@@ -17,7 +17,6 @@ export type Database = {
           product_id: string | null
           product_name: string
           quantity: number
-          selected_variant: string | null
           unit_price: number
         }
         Insert: {
@@ -27,7 +26,6 @@ export type Database = {
           product_id?: string | null
           product_name: string
           quantity?: number
-          selected_variant?: string | null
           unit_price: number
         }
         Update: {
@@ -37,7 +35,6 @@ export type Database = {
           product_id?: string | null
           product_name?: string
           quantity?: number
-          selected_variant?: string | null
           unit_price?: number
         }
         Relationships: [

@@ -22,7 +22,6 @@ export interface Product {
 export interface CartItem {
   product: Product;
   quantity: number;
-  ?: string;
 }
 
 export interface Order {
@@ -49,7 +48,6 @@ export interface OrderItem {
   productName: string;
   quantity: number;
   unitPrice: number;
-  ?: string;
 }
 
 export interface CheckoutFormData {

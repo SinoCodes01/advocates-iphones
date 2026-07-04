@@ -221,9 +221,6 @@ export function OrderSlideOver({
                           </p>
                           <p className="text-xs text-gray-500">
                             Qty: {item.quantity}
-                            {item.selectedVariant
-                              ? ` • ${item.selectedVariant}`
-                              : ""}
                           </p>
                         </div>
                       </div>

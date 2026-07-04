@@ -185,7 +185,6 @@ export const mockOrders = [
         productName: "iPhone 15 Pro 256GB",
         quantity: 1,
         unitPrice: 24999,
-        selectedVariant: "Natural Titanium",
       },
     ],
   },
