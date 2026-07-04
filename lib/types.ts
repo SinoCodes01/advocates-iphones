@@ -22,7 +22,7 @@ export interface Product {
 export interface CartItem {
   product: Product;
   quantity: number;
-  selectedVariant?: string;
+  ?: string;
 }
 
 export interface Order {
@@ -49,7 +49,7 @@ export interface OrderItem {
   productName: string;
   quantity: number;
   unitPrice: number;
-  selectedVariant?: string;
+  ?: string;
 }
 
 export interface CheckoutFormData {

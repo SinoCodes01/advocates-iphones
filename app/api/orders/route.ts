@@ -74,8 +74,7 @@ export async function POST(request: Request) {
       product_name: item.product.name,
       quantity: item.quantity,
       unit_price: item.product.price,
-      selected_variant: item.selectedVariant || item.product.storage || "",
-    }));
+          }));
 
     const { error: itemsError } = await supabase
       .from("order_items")
@@ -155,8 +154,7 @@ export async function GET(request: Request) {
         productId: item.product_id,
         productName: item.product_name,
         unitPrice: item.unit_price,
-        selectedVariant: item.selected_variant,
-        createdAt: item.created_at,
+                createdAt: item.created_at,
       })),
     }));
 

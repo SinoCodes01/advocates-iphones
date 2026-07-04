@@ -69,7 +69,7 @@ export default function CartPage() {
           {/* Cart items */}
           <div className="lg:col-span-2 space-y-4">
             {items.map((item) => (
-              <Card key={`${item.product.id}-${item.selectedVariant}`}>
+              <Card key={`${item.product.id}`}>
                 <CardContent className="p-4 sm:p-6">
                   <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
                     {/* Image */}
@@ -99,17 +99,18 @@ export default function CartPage() {
                             {item.product.name}
                           </h3>
                           <div className="flex flex-wrap gap-2 mt-1">
-                            {item.selectedVariant && (
-                              <p className="text-sm text-gray-500">{item.selectedVariant}</p>
-                            )}
                             {item.product.storage && (
                               <p className="text-sm text-gray-500">{item.product.storage}</p>
+                            )
+                            }
+                            {item.product.color && (
+                              <p className="text-sm text-gray-500">{item.product.color}</p>
                             )}
                           </div>
                         </div>
                         <button
                           onClick={() =>
-                            removeItem(item.product.id, item.selectedVariant)
+                            removeItem(item.product.id)
                           }
                           className="p-2 text-gray-400 hover:text-red-500 transition-colors"
                           aria-label="Remove item"
@@ -125,8 +126,7 @@ export default function CartPage() {
                             onClick={() =>
                               updateQuantity(
                                 item.product.id,
-                                item.quantity - 1,
-                                item.selectedVariant
+                                item.quantity - 1
                               )
                             }
                             className="w-8 h-8 sm:w-10 sm:h-10 bg-white shadow-sm hover:bg-gray-100 rounded-full flex items-center justify-center transition-colors"
@@ -141,8 +141,7 @@ export default function CartPage() {
                             onClick={() =>
                               updateQuantity(
                                 item.product.id,
-                                item.quantity + 1,
-                                item.selectedVariant
+                                item.quantity + 1
                               )
                             }
                             className="w-8 h-8 sm:w-10 sm:h-10 bg-white shadow-sm hover:bg-gray-100 rounded-full flex items-center justify-center transition-colors"

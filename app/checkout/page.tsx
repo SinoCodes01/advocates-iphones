@@ -517,7 +517,7 @@ export default function CheckoutPage() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {(step === "confirmation" ? finalOrderData?.items : items)?.map((item) => (
-                    <div key={`${item.product.id}-${item.selectedVariant}`} className="flex gap-4">
+                    <div key={`${item.product.id}`} className="flex gap-4">
                       <div className="w-16 h-16 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
                         {item.product.images[0] ? (
                           <Image
@@ -539,9 +539,9 @@ export default function CheckoutPage() {
                         <p className="font-medium text-gray-900 truncate">
                           {item.product.name}
                         </p>
-                        {item.selectedVariant && (
+                        {(item.product.storage || item.product.color) && (
                           <p className="text-sm text-gray-500">
-                            {item.selectedVariant}
+                            {item.product.storage || item.product.color}
                           </p>
                         )}
                         <p className="text-sm text-gray-500">
