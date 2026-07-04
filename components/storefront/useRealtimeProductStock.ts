@@ -3,14 +3,15 @@
 import { useEffect, useRef } from "react";
 import { supabase } from "@/lib/supabase";
 
-function isChannelForProduct(channel: any, channelName: string) {
-  if (!channel) {
-    return false;
-  }
+type StockHandler = (stockQuantity: number) => void;
 
-  const topic = channel.topic;
-  return topic === channelName || topic === `realtime:${channelName}`;
-}
+type ChannelRegistryEntry = {
+  channel: any;
+  handlers: Set<StockHandler>;
+  topic: string;
+};
+
+const channelRegistry = new Map<string, ChannelRegistryEntry>();
 
 export function useRealtimeProductStock(
   productId?: string | number,
@@ -28,19 +29,24 @@ export function useRealtimeProductStock(
       return;
     }
 
-    const channelName = `product-stock-${productId}`;
+    const topic = `product-stock-${productId}`;
     const client = supabase;
 
-    if (channelRef.current && !isChannelForProduct(channelRef.current, channelName)) {
-      client.removeChannel(channelRef.current);
-      channelRef.current = null;
-    }
+    const handleStockChange = (stockQuantity: number) => {
+      callbackRef.current?.(stockQuantity);
+    };
 
-    let channel = channelRef.current;
+    let entry = channelRegistry.get(topic);
 
-    if (!channel) {
-      channel = client.channel(channelName);
-      channelRef.current = channel;
+    if (!entry) {
+      const channel = client.channel(topic);
+      const handlers = new Set<StockHandler>();
+
+      entry = {
+        channel,
+        handlers,
+        topic,
+      };
 
       channel.on(
         "postgres_changes",
@@ -52,7 +58,7 @@ export function useRealtimeProductStock(
         },
         (payload: { new?: { stock_quantity?: number | string | null } }) => {
           const nextStock = Number(payload.new?.stock_quantity ?? 0);
-          callbackRef.current?.(nextStock);
+          entry!.handlers.forEach((handler) => handler(nextStock));
         }
       );
 
@@ -60,22 +66,32 @@ export function useRealtimeProductStock(
         if (process.env.NODE_ENV !== "production") {
           console.debug("[realtime-product-stock]", {
             productId,
-            topic: channel?.topic,
+            topic: channel.topic,
             status,
           });
         }
-
-        if (status === "CLOSED" || status === "CHANNEL_ERROR") {
-          channelRef.current = null;
-        }
       });
+
+      channelRegistry.set(topic, entry);
     }
 
-    return () => {
-      const channelToCleanup = channelRef.current;
+    entry.handlers.add(handleStockChange);
+    channelRef.current = entry.channel;
 
-      if (channelToCleanup && isChannelForProduct(channelToCleanup, channelName)) {
-        client.removeChannel(channelToCleanup);
+    return () => {
+      const currentEntry = channelRegistry.get(topic);
+      if (!currentEntry) {
+        return;
+      }
+
+      currentEntry.handlers.delete(handleStockChange);
+
+      if (currentEntry.handlers.size === 0) {
+        client.removeChannel(currentEntry.channel);
+        channelRegistry.delete(topic);
+      }
+
+      if (channelRef.current === currentEntry.channel) {
         channelRef.current = null;
       }
     };
