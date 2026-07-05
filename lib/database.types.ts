@@ -102,6 +102,54 @@ export type Database = {
         }
         Relationships: []
       }
+      promotions: {
+        Row: {
+          id: string
+          label: string
+          title: string
+          href: string
+          active: boolean | null
+          display_order: number | null
+          created_at: string | null
+        }
+        Insert: {
+          id?: string
+          label: string
+          title: string
+          href: string
+          active?: boolean | null
+          display_order?: number | null
+          created_at?: string | null
+        }
+        Update: {
+          id?: string
+          label?: string
+          title?: string
+          href?: string
+          active?: boolean | null
+          display_order?: number | null
+          created_at?: string | null
+        }
+        Relationships: []
+      }
+      store_settings: {
+        Row: {
+          id: string
+          free_delivery_threshold: number
+          updated_at: string | null
+        }
+        Insert: {
+          id?: string
+          free_delivery_threshold?: number
+          updated_at?: string | null
+        }
+        Update: {
+          id?: string
+          free_delivery_threshold?: number
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       products: {
         Row: {
           active: boolean | null

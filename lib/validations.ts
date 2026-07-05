@@ -13,6 +13,8 @@ export const orderSchema = z.object({
       name: z.string(),
       price: z.number(),
       storage: z.string().optional(),
+      color: z.string().optional(),
+      condition: z.string().optional(),
     }),
     quantity: z.number().int().positive(),
       })).min(1, "At least one item is required"),
