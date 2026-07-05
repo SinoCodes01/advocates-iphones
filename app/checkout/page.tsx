@@ -25,6 +25,7 @@ export default function CheckoutPage() {
     total: number;
     deliveryFee: number;
   } | null>(null);
+  const [freeDeliveryThreshold, setFreeDeliveryThreshold] = useState<number | null>(null);
   const { showToast } = useToast();
 
   const [formData, setFormData] = useState({
@@ -32,17 +33,29 @@ export default function CheckoutPage() {
     phone: "",
     email: "",
     deliveryAddress: "",
+    colourPreference: "",
     paymentMethod: "whatsapp" as "whatsapp" | "eft" | "cod",
     notes: "",
     deliveryOptionId: "local",
   });
 
   useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const res = await fetch("/api/settings");
+        const data = await res.json();
+        if (data.success && data.settings) {
+          setFreeDeliveryThreshold(data.settings.free_delivery_threshold);
+        }
+      } catch (error) {
+        console.error("Failed to fetch settings:", error);
+      }
+    };
+    fetchSettings();
     setMounted(true);
   }, []);
 
   const DELIVERY_OPTIONS = [
-    { id: "collection", label: "Collect in Store (KuGompo City)", price: 0 },
     { id: "local", label: "KuGompo City & Surrounds", price: 100 },
     { id: "major", label: "Major Cities (JHB, DBN, PTA)", price: 150 },
     { id: "regional", label: "Regional Areas", price: 200 },
@@ -50,7 +63,12 @@ export default function CheckoutPage() {
 
   const subtotal = getSubtotal();
   const selectedDelivery = DELIVERY_OPTIONS.find(opt => opt.id === formData.deliveryOptionId) || DELIVERY_OPTIONS[0];
-  const deliveryFee = selectedDelivery.price;
+  
+  let deliveryFee = selectedDelivery.price;
+  if (freeDeliveryThreshold !== null && subtotal >= freeDeliveryThreshold) {
+    deliveryFee = 0;
+  }
+
   const total = subtotal + deliveryFee;
 
   if (!mounted) {
@@ -120,16 +138,20 @@ export default function CheckoutPage() {
   const whatsappMessage = finalOrderData
     ? buildWhatsAppMessage(
         finalOrderData.orderNumber,
-        finalOrderData.items.map(i => ({ 
-          name: i.product.name, 
-          quantity: i.quantity, 
-          price: i.product.price 
+        finalOrderData.items.map(i => ({
+          name: i.product.name,
+          quantity: i.quantity,
+          price: i.product.price,
+          storage: i.product.storage,
+          color: i.product.color,
+          condition: i.product.condition
         })),
         finalOrderData.total,
         finalOrderData.deliveryFee,
         formData.customerName,
         formData.deliveryAddress,
-        formData.paymentMethod
+        formData.paymentMethod,
+        formData.colourPreference
       )
     : "";
 
@@ -283,17 +305,35 @@ export default function CheckoutPage() {
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
-                        {formData.deliveryOptionId === "collection" ? "Collection Information (optional)" : "Delivery Address *"}
+                        Delivery Address *
                       </label>
                       <textarea
                         name="deliveryAddress"
-                        required={formData.deliveryOptionId !== "collection"}
+                        required
                         value={formData.deliveryAddress}
                         onChange={handleInputChange}
                         rows={3}
                         className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500 resize-none"
-                        placeholder={formData.deliveryOptionId === "collection" ? "Let us know when you'd like to collect..." : "123 Main Street, KuGompo City, 8001"}
+                        placeholder="123 Main Street, KuGompo City, 8001"
                       />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Preferred Colour{" "}
+                        <span className="text-gray-400 font-normal">(optional)</span>
+                      </label>
+                      <textarea
+                        name="colourPreference"
+                        value={formData.colourPreference}
+                        onChange={handleInputChange}
+                        rows={2}
+                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500 resize-none"
+                        placeholder="e.g. Black, Midnight, Natural Titanium, any dark colour..."
+                      />
+                      <p className="text-xs text-gray-400 mt-1">
+                        We&apos;ll do our best to match your preference — our team will confirm availability via WhatsApp.
+                      </p>
                     </div>
 
                     <div>
@@ -321,7 +361,9 @@ export default function CheckoutPage() {
                             <div className="flex-1">
                               <p className="font-medium text-navy-900">{option.label}</p>
                               <p className="text-sm text-gray-600">
-                                {formatPrice(option.price)}
+                                {freeDeliveryThreshold !== null && subtotal >= freeDeliveryThreshold 
+                                  ? <><span className="line-through mr-2">{formatPrice(option.price)}</span><span className="text-green-600 font-bold">FREE</span></>
+                                  : formatPrice(option.price)}
                               </p>
                             </div>
                           </label>

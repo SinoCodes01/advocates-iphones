@@ -10,6 +10,7 @@ export async function GET(request: Request) {
     const category = searchParams.get("category"); // Can be comma-separated
     const condition = searchParams.get("condition"); // Can be comma-separated
     const storage = searchParams.get("storage"); // Can be comma-separated
+    const color = searchParams.get("color"); // Can be comma-separated
     const minPrice = searchParams.get("minPrice");
     const maxPrice = searchParams.get("maxPrice");
     const search = searchParams.get("search");
@@ -49,6 +50,12 @@ export async function GET(request: Request) {
     if (storage) {
       const storageSizes = storage.split(",");
       query = query.in("storage", storageSizes);
+    }
+
+    // Handle multi-select for color
+    if (color) {
+      const colors = color.split(",");
+      query = query.in("color", colors);
     }
 
     // Handle price range

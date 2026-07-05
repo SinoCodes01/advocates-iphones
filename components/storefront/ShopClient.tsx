@@ -34,12 +34,12 @@ export function ShopClient({ initialProducts }: ShopClientProps) {
   }, [showMobileFilters]);
 
   // We only fetch client-side if filters are active
-  const hasActiveFilters = 
-    selectedCategories.length > 0 || 
-    selectedConditions.length > 0 || 
-    selectedStorage.length > 0 || 
-    minPrice !== "" || 
-    maxPrice !== "" || 
+  const hasActiveFilters =
+    selectedCategories.length > 0 ||
+    selectedConditions.length > 0 ||
+    selectedStorage.length > 0 ||
+    minPrice !== "" ||
+    maxPrice !== "" ||
     searchQuery !== "";
 
   useEffect(() => {

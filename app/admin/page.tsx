@@ -10,6 +10,7 @@ import { Product, Order } from "@/lib/types";
 import { ProductForm } from "@/components/admin/ProductForm";
 import { OrderSlideOver } from "@/components/admin/OrderSlideOver";
 import { AdminCharts } from "@/components/admin/AdminCharts";
+import { AdminSettings } from "@/components/admin/AdminSettings";
 import {
   Package,
   ShoppingBag,
@@ -34,7 +35,7 @@ import {
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 
-type Tab = "dashboard" | "products" | "orders";
+type Tab = "dashboard" | "products" | "orders" | "settings";
 
 const ORDER_STATUSES = [
   "all",
@@ -445,6 +446,7 @@ export default function AdminPage() {
                 { tab: "dashboard", icon: <BarChart3 className="w-4 h-4" />, label: "Dashboard", badge: undefined },
                 { tab: "products", icon: <Package className="w-4 h-4" />, label: "Products", badge: undefined },
                 { tab: "orders", icon: <ShoppingBag className="w-4 h-4" />, label: "Orders", badge: pendingOrders },
+                { tab: "settings", icon: <CheckSquare className="w-4 h-4" />, label: "Settings", badge: undefined },
               ] as const
             ).map(({ tab, icon, label, badge }) => (
               <button

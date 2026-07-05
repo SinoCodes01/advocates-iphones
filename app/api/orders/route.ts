@@ -68,13 +68,16 @@ export async function POST(request: Request) {
     if (orderError) throw orderError;
 
     // 2. Create order items and reserve products
-    const orderItems = items.map((item) => ({
-      order_id: orderData.id,
-      product_id: item.product.id,
-      product_name: item.product.name,
-      quantity: item.quantity,
-      unit_price: item.product.price,
-          }));
+    const orderItems = items.map((item) => {
+      const details = [item.product.storage, item.product.color, item.product.condition].filter(Boolean).join(", ");
+      return {
+        order_id: orderData.id,
+        product_id: item.product.id,
+        product_name: `${item.product.name}${details ? ` (${details})` : ""}`,
+        quantity: item.quantity,
+        unit_price: item.product.price,
+      };
+    });
 
     const { error: itemsError } = await supabase
       .from("order_items")

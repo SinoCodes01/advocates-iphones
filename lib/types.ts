@@ -64,3 +64,17 @@ export interface ApiError {
   code: string;
   details?: any;
 }
+
+export interface Promotion {
+  id: string;
+  label: string;
+  title: string;
+  href: string;
+  active: boolean;
+  display_order: number;
+}
+
+export interface StoreSettings {
+  id: string;
+  free_delivery_threshold: number;
+}

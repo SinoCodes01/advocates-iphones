@@ -4,22 +4,29 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { ArrowRight, Sparkles } from "lucide-react";
 
-const promos = [
-  {
-    id: "winter-sale",
-    label: "Winter Sale",
-    title: "Up to 12% off selected iPhones this season",
-    href: "/shop",
-    },
-] as const;
-
 export function SalePromoCarousel() {
+  const [promos, setPromos] = useState<any[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [direction, setDirection] = useState<"left" | "right">("right");
 
   useEffect(() => {
-    if (isPaused) return;
+    const fetchPromos = async () => {
+      try {
+        const res = await fetch("/api/promotions");
+        const data = await res.json();
+        if (data.success && data.promotions.length > 0) {
+          setPromos(data.promotions);
+        }
+      } catch (err) {
+        console.error("Failed to fetch promos", err);
+      }
+    };
+    fetchPromos();
+  }, []);
+
+  useEffect(() => {
+    if (isPaused || promos.length === 0) return;
 
     const interval = window.setInterval(() => {
       setActiveIndex((current) => {
@@ -30,7 +37,9 @@ export function SalePromoCarousel() {
     }, 4200);
 
     return () => window.clearInterval(interval);
-  }, [isPaused]);
+  }, [isPaused, promos.length]);
+
+  if (promos.length === 0) return null;
 
   const currentPromo = promos[activeIndex];
 
@@ -52,13 +61,13 @@ export function SalePromoCarousel() {
           <div className="min-w-0 overflow-hidden">
             <div
               key={currentPromo.id}
-              className={`flex items-center gap-2 text-sm text-gray-700 sm:text-[15px] ${
+              className={`flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-2 text-xs text-gray-700 sm:text-[15px] ${
                 direction === "right" ? "animate-promo-enter-right" : "animate-promo-enter-left"
               }`}
               role="status"
               aria-live="polite"
             >
-              <span className="truncate font-semibold text-navy-900">{currentPromo.label}</span>
+              <span className="font-semibold text-navy-900">{currentPromo.label}</span>
               <span className="truncate">{currentPromo.title}</span>
             </div>
           </div>

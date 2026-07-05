@@ -32,15 +32,19 @@ export function getWhatsAppLink(
 
 export function buildWhatsAppMessage(
   orderNumber: string,
-  items: { name: string; quantity: number; price: number }[],
+  items: { name: string; quantity: number; price: number; storage?: string; color?: string; condition?: string }[],
   total: number,
   deliveryFee: number,
   customerName: string,
   deliveryAddress: string,
-  paymentMethod: string
+  paymentMethod: string,
+  colourPreference?: string
 ): string {
   const itemsList = items
-    .map((item) => `• ${item.name} x${item.quantity} - ${formatPrice(item.price * item.quantity)}`)
+    .map((item) => {
+      const details = [item.storage, item.color, item.condition].filter(Boolean).join(", ");
+      return `• ${item.name}${details ? ` (${details})` : ""} x${item.quantity} - ${formatPrice(item.price * item.quantity)}`;
+    })
     .join("\n");
 
   const paymentMethodLabel = {
@@ -49,13 +53,17 @@ export function buildWhatsAppMessage(
     cod: "Cash on Delivery",
   }[paymentMethod] || paymentMethod;
 
+  const colourLine = colourPreference?.trim()
+    ? `\n*Colour Preference:* ${colourPreference.trim()}`
+    : "";
+
   return `*ORDER CONFIRMATION - ${orderNumber}*
 
 Hi Advocates iPhones! I've just placed an order on your website.
 
 *Customer Details:*
 • Name: ${customerName}
-• Delivery: ${deliveryAddress || "Store Collection"}
+• Delivery: ${deliveryAddress || "Store Collection"}${colourLine}
 
 *Order Summary:*
 ${itemsList}

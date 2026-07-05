@@ -72,3 +72,28 @@
 .no-spinner {
   -moz-appearance: textfield;
 }
+
+/* Dual range slider thumbs */
+.range-thumb::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background-color: #0f172a; /* navy-900 */
+  border: 3px solid white;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.25);
+  cursor: pointer;
+  pointer-events: all;
+  position: relative;
+}
+.range-thumb::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background-color: #0f172a;
+  border: 3px solid white;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.25);
+  cursor: pointer;
+  pointer-events: all;
+}

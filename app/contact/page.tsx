@@ -25,7 +25,7 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <p className="font-bold text-navy-900">Phone & WhatsApp</p>
-                      <p className="text-gray-600">073 515 2402</p>
+                      <p className="text-gray-600">0735152402</p>
                     </div>
                   </div>
 
