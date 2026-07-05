@@ -1,9 +1,12 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase-server";
+import { createAdminClient } from "@/lib/supabase-admin";  // Changed from createClient
+
+export const dynamic = 'force-dynamic';
+
 
 export async function GET() {
   try {
-    const supabase = createClient();
+    const supabase = createAdminClient();  // Using admin client
     const { data, error } = await supabase
       .from("promotions")
       .select("*")

@@ -8,11 +8,12 @@ export async function POST(request: Request) {
 
     const { error } = await supabase
       .from("store_settings")
-      .upsert({ id: 'default', free_delivery_threshold: body.free_delivery_threshold });
+      .upsert({ id: 'default', ...body });
 
     if (error) throw error;
 
-    return NextResponse.json({ success: true });
+    // Return the complete saved settings object
+    return NextResponse.json({ success: true, settings: { ...body } });
   } catch (error: any) {
     console.error("Settings update error:", error);
     return NextResponse.json(

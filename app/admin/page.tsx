@@ -1032,6 +1032,13 @@ export default function AdminPage() {
             )}
           </div>
         )}
+
+        {/* ── Settings Tab ──────────────────────────────────────── */}
+        {activeTab === "settings" && (
+          <div className="animate-in fade-in duration-300">
+            <AdminSettings />
+          </div>
+        )}
       </div>
 
       {/* ── Product Form Modal ─────────────────────────────────── */}

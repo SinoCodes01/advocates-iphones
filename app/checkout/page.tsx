@@ -42,7 +42,8 @@ export default function CheckoutPage() {
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const res = await fetch("/api/settings");
+        const timestamp = new Date().getTime();
+        const res = await fetch(`/api/settings?t=${timestamp}`, { cache: 'no-store' });
         const data = await res.json();
         if (data.success && data.settings) {
           setFreeDeliveryThreshold(data.settings.free_delivery_threshold);

@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { X } from "lucide-react";
-import { categories } from "@/lib/mock-data";
 
 interface FilterSidebarProps {
   selectedCategories: string[];
@@ -17,6 +16,7 @@ interface FilterSidebarProps {
   setMaxPrice: (price: string) => void;
   onClear: () => void;
   onClose?: () => void;
+  availableCategories?: string[];
 }
 
 const STORAGE_OPTIONS = ["64GB", "128GB", "256GB", "512GB", "1TB"];
@@ -42,6 +42,7 @@ export function FilterSidebar({
   setMaxPrice,
   onClear,
   onClose,
+  availableCategories = ["iPhone 15", "iPhone 14", "iPhone 13", "Accessories"],
 }: FilterSidebarProps) {
   const minVal = minPrice ? Number(minPrice) : PRICE_MIN;
   const maxVal = maxPrice ? Number(maxPrice) : PRICE_MAX;
@@ -102,7 +103,7 @@ export function FilterSidebar({
       <div>
         <h3 className="text-sm font-bold text-navy-900 uppercase tracking-wider mb-4">Model</h3>
         <div className="space-y-2">
-          {categories
+          {availableCategories
             .filter((c) => c !== "All")
             .map((cat) => (
               <label key={cat} className="flex items-center gap-3 cursor-pointer group">

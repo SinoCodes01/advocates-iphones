@@ -24,9 +24,10 @@ export function AdminSettings() {
   const fetchData = async () => {
     setIsLoading(true);
     try {
+      const timestamp = new Date().getTime();
       const [settingsRes, promosRes] = await Promise.all([
-        fetch("/api/settings"),
-        fetch("/api/promotions")
+        fetch(`/api/settings?t=${timestamp}`, { cache: 'no-store' }),
+        fetch(`/api/promotions?t=${timestamp}`, { cache: 'no-store' })
       ]);
       const settingsData = await settingsRes.json();
       const promosData = await promosRes.json();
@@ -35,6 +36,27 @@ export function AdminSettings() {
       if (promosData.success) setPromotions(promosData.promotions);
     } catch (error) {
       console.error("Failed to fetch settings:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Function to refresh data after operations
+  const refreshData = async () => {
+    setIsLoading(true);
+    try {
+      const timestamp = new Date().getTime();
+      const [settingsRes, promosRes] = await Promise.all([
+        fetch(`/api/settings?t=${timestamp}`, { cache: 'no-store' }),
+        fetch(`/api/promotions?t=${timestamp}`, { cache: 'no-store' })
+      ]);
+      const settingsData = await settingsRes.json();
+      const promosData = await promosRes.json();
+
+      if (settingsData.success) setSettings(settingsData.settings);
+      if (promosData.success) setPromotions(promosData.promotions);
+    } catch (error) {
+      console.error("Failed to refresh data:", error);
     } finally {
       setIsLoading(false);
     }
@@ -75,8 +97,13 @@ export function AdminSettings() {
         body: JSON.stringify({ free_delivery_threshold: Number(settings.free_delivery_threshold) })
       });
       const data = await res.json();
-      if (data.success) alert("Settings saved!");
-      else alert(data.error || "Failed to save settings");
+      if (data.success) {
+        alert("Settings saved!");
+        // Refresh admin state after successful settings save
+        await refreshData();
+      } else {
+        alert(data.error || "Failed to save settings");
+      }
     } catch (err) {
       alert("Error saving settings");
     } finally {
@@ -93,9 +120,12 @@ export function AdminSettings() {
       });
       const data = await res.json();
       if (data.success) {
-        setPromotions([...promotions, data.promotion]);
+        // Use functional state update for promotions
+        setPromotions(prev => [...prev, data.promotion]);
         setIsAddingPromo(false);
         setNewPromo({ label: "", title: "", href: "", active: true, display_order: 0 });
+        // Refresh admin state to ensure consistency
+        await refreshData();
       } else {
         alert(data.error || "Failed to create promotion");
       }
@@ -110,7 +140,10 @@ export function AdminSettings() {
       const res = await fetch(`/api/admin/promotions?id=${id}`, { method: "DELETE" });
       const data = await res.json();
       if (data.success) {
-        setPromotions(promotions.filter(p => p.id !== id));
+        // Use functional state update for promotions
+        setPromotions(prev => prev.filter(p => p.id !== id));
+        // Refresh admin state after deletion
+        await refreshData();
       } else {
         alert(data.error || "Failed to delete promotion");
       }
@@ -128,7 +161,10 @@ export function AdminSettings() {
       });
       const data = await res.json();
       if (data.success) {
-        setPromotions(promotions.map(p => p.id === promo.id ? { ...p, active: !p.active } : p));
+        // Use functional state update for promotions
+        setPromotions(prev => prev.map(p => p.id === promo.id ? { ...p, active: !p.active } : p));
+        // Refresh admin state after toggle
+        await refreshData();
       } else {
         alert(data.error || "Failed to update promotion");
       }
@@ -165,7 +201,7 @@ export function AdminSettings() {
               value={discountPercent}
               onChange={(e) => setDiscountPercent(e.target.value)}
               placeholder="e.g. 10"
-              className="pl-4 pr-8 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-500 w-32"
+              className="pl-4 pr-8 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-500 w-32 no-spinner"
             />
             <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 font-bold">%</span>
           </div>
@@ -183,7 +219,7 @@ export function AdminSettings() {
           </div>
           <h2 className="text-xl font-bold text-navy-900">Delivery Settings</h2>
         </div>
-        
+
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-semibold text-navy-900 mb-2">
@@ -191,9 +227,9 @@ export function AdminSettings() {
             </label>
             <input
               type="number"
-              value={settings?.free_delivery_threshold || 0}
-              onChange={(e) => setSettings(prev => prev ? { ...prev, free_delivery_threshold: Number(e.target.value) } : null)}
-              className="px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-500 w-64 block"
+              value={settings?.free_delivery_threshold === 0 && !settings?.free_delivery_threshold ? "" : settings?.free_delivery_threshold}
+              onChange={(e) => setSettings(prev => prev ? { ...prev, free_delivery_threshold: e.target.value === "" ? 0 : Number(e.target.value) } : null)}
+              className="px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-500 w-64 block no-spinner"
             />
             <p className="text-xs text-gray-500 mt-1">Orders above this amount will have their delivery fee waived automatically.</p>
           </div>
@@ -224,27 +260,27 @@ export function AdminSettings() {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-semibold text-gray-700 mb-1">Label (e.g. Winter Sale)</label>
-                <input 
-                  type="text" 
-                  value={newPromo.label} 
+                <input
+                  type="text"
+                  value={newPromo.label}
                   onChange={e => setNewPromo({...newPromo, label: e.target.value})}
                   className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"
                 />
               </div>
               <div>
                 <label className="block text-xs font-semibold text-gray-700 mb-1">Link (e.g. /shop)</label>
-                <input 
-                  type="text" 
-                  value={newPromo.href} 
+                <input
+                  type="text"
+                  value={newPromo.href}
                   onChange={e => setNewPromo({...newPromo, href: e.target.value})}
                   className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"
                 />
               </div>
               <div className="col-span-2">
                 <label className="block text-xs font-semibold text-gray-700 mb-1">Title (e.g. Up to 12% off selected iPhones)</label>
-                <input 
-                  type="text" 
-                  value={newPromo.title} 
+                <input
+                  type="text"
+                  value={newPromo.title}
                   onChange={e => setNewPromo({...newPromo, title: e.target.value})}
                   className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"
                 />

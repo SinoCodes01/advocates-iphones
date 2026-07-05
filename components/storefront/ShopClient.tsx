@@ -106,6 +106,10 @@ export function ShopClient({ initialProducts }: ShopClientProps) {
     setSearchQuery("");
   };
 
+  const availableCategories = Array.from(
+    new Set(initialProducts.map((p) => p.category).filter(Boolean))
+  ) as string[];
+
   return (
     <div className="flex flex-col lg:flex-row gap-8">
       {/* Desktop Sidebar */}
@@ -123,6 +127,7 @@ export function ShopClient({ initialProducts }: ShopClientProps) {
             maxPrice={maxPrice}
             setMaxPrice={setMaxPrice}
             onClear={clearFilters}
+            availableCategories={availableCategories}
           />
         </div>
       </aside>
@@ -238,6 +243,7 @@ export function ShopClient({ initialProducts }: ShopClientProps) {
               setMaxPrice={setMaxPrice}
               onClear={clearFilters}
               onClose={() => setShowMobileFilters(false)}
+              availableCategories={availableCategories}
             />
           </div>
         </div>

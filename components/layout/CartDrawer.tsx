@@ -9,14 +9,34 @@ import { formatPrice, cn } from "@/lib/utils";
 
 export function CartDrawer() {
   const [mounted, setMounted] = useState(false);
+  const [freeDeliveryThreshold, setFreeDeliveryThreshold] = useState<number | null>(null);
   const { items, isOpen, closeCart, updateQuantity, removeItem, getSubtotal } =
     useCartStore();
 
   useEffect(() => {
     setMounted(true);
+    
+    // Fetch free delivery threshold
+    const fetchSettings = async () => {
+      try {
+        const timestamp = new Date().getTime();
+        const res = await fetch(`/api/settings?t=${timestamp}`, { cache: 'no-store' });
+        const data = await res.json();
+        if (data.success && data.settings) {
+          setFreeDeliveryThreshold(data.settings.free_delivery_threshold);
+        }
+      } catch (error) {
+        console.error("Failed to fetch settings:", error);
+      }
+    };
+    fetchSettings();
   }, []);
 
   if (!mounted) return null;
+
+  const subtotal = getSubtotal();
+  const progressToFreeDelivery = freeDeliveryThreshold ? Math.min((subtotal / freeDeliveryThreshold) * 100, 100) : 0;
+  const remainingForFreeDelivery = freeDeliveryThreshold ? Math.max(freeDeliveryThreshold - subtotal, 0) : 0;
 
   return (
     <>
@@ -52,6 +72,21 @@ export function CartDrawer() {
             <X className="w-6 h-6 text-gray-500" />
           </button>
         </div>
+
+        {/* Free Delivery Progress (only if threshold is set and > 0) */}
+        {freeDeliveryThreshold ? (
+          <div className="bg-brand-50 px-6 py-4 border-b border-brand-100">
+            <div className="flex justify-between text-sm font-bold text-navy-900 mb-2">
+              <span>{remainingForFreeDelivery === 0 ? "🎉 Free Delivery Unlocked!" : `Only ${formatPrice(remainingForFreeDelivery)} away from free delivery!`}</span>
+            </div>
+            <div className="w-full bg-brand-200 rounded-full h-1.5 overflow-hidden">
+              <div 
+                className="bg-brand-500 h-1.5 rounded-full transition-all duration-500 ease-out" 
+                style={{ width: `${progressToFreeDelivery}%` }}
+              ></div>
+            </div>
+          </div>
+        ) : null}
 
         {/* Cart items */}
         <div className="flex-1 overflow-y-auto p-6">
@@ -156,12 +191,14 @@ export function CartDrawer() {
             <div className="flex justify-between items-center">
               <span className="text-gray-600">Subtotal</span>
               <span className="text-2xl font-bold text-navy-900">
-                {formatPrice(getSubtotal())}
+                {formatPrice(subtotal)}
               </span>
             </div>
-            <p className="text-sm text-gray-500">
-              Delivery calculated at checkout
-            </p>
+            {!freeDeliveryThreshold && (
+              <p className="text-sm text-gray-500">
+                Delivery calculated at checkout
+              </p>
+            )}
             <Link
               href="/checkout"
               onClick={closeCart}

@@ -13,7 +13,8 @@ export function SalePromoCarousel() {
   useEffect(() => {
     const fetchPromos = async () => {
       try {
-        const res = await fetch("/api/promotions");
+        const timestamp = new Date().getTime();
+        const res = await fetch(`/api/promotions?t=${timestamp}`, { cache: 'no-store' });
         const data = await res.json();
         if (data.success && data.promotions.length > 0) {
           setPromos(data.promotions);
