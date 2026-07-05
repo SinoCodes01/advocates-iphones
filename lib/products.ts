@@ -108,7 +108,7 @@ export const getProducts = (filters: {
       return data.map(normalizeProduct);
     },
     cacheKey,
-    { revalidate: 3600, tags: ["products"] }
+    { revalidate: 60, tags: ["products"] }
   )();
 };
 
@@ -137,7 +137,7 @@ export const getProductBySlug = (slug: string) => {
       return normalizeProduct(data);
     },
     ["product-detail", slug],
-    { revalidate: 3600, tags: ["products"] }
+    { revalidate: 60, tags: ["products"] }
   )();
 };
 
