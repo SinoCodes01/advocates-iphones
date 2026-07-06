@@ -1,42 +1,32 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, useRef, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { ProductGrid } from "@/components/storefront/ProductGrid";
 import { FilterSidebar } from "@/components/storefront/FilterSidebar";
 import { Product } from "@/lib/types";
+import { queryKeys, fetchProducts } from "@/lib/queries";
 import { Search, SlidersHorizontal, X, Loader2 } from "lucide-react";
+
+const PAGE_SIZE = 12;
 
 interface ShopClientProps {
   initialProducts: Product[];
 }
 
 export function ShopClient({ initialProducts }: ShopClientProps) {
-  const [products, setProducts] = useState<Product[]>(initialProducts);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(initialProducts.length >= 12);
-  
+  const [allProducts, setAllProducts] = useState<Product[]>(initialProducts);
+
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedConditions, setSelectedConditions] = useState<string[]>([]);
   const [selectedStorage, setSelectedStorage] = useState<string[]>([]);
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
-  
   const [sortBy, setSortBy] = useState("featured");
   const [showMobileFilters, setShowMobileFilters] = useState(false);
 
-  // Lock scroll when mobile filters are open
-  useEffect(() => {
-    if (showMobileFilters) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "unset";
-    }
-  }, [showMobileFilters]);
-
-  // We only fetch client-side if filters are active
   const hasActiveFilters =
     selectedCategories.length > 0 ||
     selectedConditions.length > 0 ||
@@ -45,79 +35,76 @@ export function ShopClient({ initialProducts }: ShopClientProps) {
     maxPrice !== "" ||
     searchQuery !== "";
 
+  // Build query params object (memoised as string to stabilise the key)
+  const queryParams: Record<string, string> = {
+    limit: String(PAGE_SIZE),
+    offset: String((page - 1) * PAGE_SIZE),
+    ...(selectedCategories.length > 0 && { category: selectedCategories.join(",") }),
+    ...(selectedConditions.length > 0 && { condition: selectedConditions.join(",") }),
+    ...(selectedStorage.length > 0 && { storage: selectedStorage.join(",") }),
+    ...(minPrice && { minPrice }),
+    ...(maxPrice && { maxPrice }),
+    ...(searchQuery && { search: searchQuery }),
+    ...(sortBy && { sort: sortBy }),
+  };
+
+  const { data: pageProducts, isFetching, isLoading } = useQuery({
+    queryKey: queryKeys.products(queryParams),
+    queryFn: () => fetchProducts(queryParams),
+    // Only enable if filters are active OR we're past page 1
+    enabled: hasActiveFilters || sortBy !== "featured" || page > 1,
+    // Keep previous results visible while next page loads
+    placeholderData: (prev) => prev,
+    staleTime: 30 * 1000,
+  });
+
+  // Accumulate pages into allProducts
   useEffect(() => {
-    if (!hasActiveFilters && sortBy === "featured") {
-      setProducts(initialProducts);
+    if (!hasActiveFilters && sortBy === "featured" && page === 1) {
+      setAllProducts(initialProducts);
       return;
     }
-
-    async function fetchProducts(currentPage: number) {
-      if (currentPage === 1) {
-        setIsLoading(true);
+    if (pageProducts) {
+      if (page === 1) {
+        setAllProducts(pageProducts);
       } else {
-        setIsLoadingMore(true);
-      }
-      try {
-        const params = new URLSearchParams();
-        
-        if (selectedCategories.length > 0) {
-          params.append("category", selectedCategories.join(","));
-        }
-        if (selectedConditions.length > 0) {
-          params.append("condition", selectedConditions.join(","));
-        }
-        if (selectedStorage.length > 0) {
-          params.append("storage", selectedStorage.join(","));
-        }
-        if (minPrice) {
-          params.append("minPrice", minPrice);
-        }
-        if (maxPrice) {
-          params.append("maxPrice", maxPrice);
-        }
-        if (searchQuery) {
-          params.append("search", searchQuery);
-        }
-        params.append("limit", "12");
-        if (currentPage > 1) {
-          params.append("offset", ((currentPage - 1) * 12).toString());
-        }
-
-        const res = await fetch(`/api/products?${params.toString()}`);
-        const data = await res.json();
-
-        if (data.success) {
-          let sortedProducts = [...data.products];
-          if (sortBy === "price-low") sortedProducts.sort((a, b) => a.price - b.price);
-          else if (sortBy === "price-high") sortedProducts.sort((a, b) => b.price - a.price);
-          else if (sortBy === "featured") sortedProducts.sort((a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0));
-          
-          if (currentPage === 1) {
-            setProducts(sortedProducts);
-          } else {
-            setProducts(prev => [...prev, ...sortedProducts]);
-          }
-          setHasMore(data.products.length >= 12);
-        }
-      } catch (error) {
-        console.error("Failed to fetch products:", error);
-      } finally {
-        setIsLoading(false);
-        setIsLoadingMore(false);
+        setAllProducts((prev) => {
+          // Deduplicate by id in case of race conditions
+          const ids = new Set(prev.map((p) => p.id));
+          return [...prev, ...pageProducts.filter((p) => !ids.has(p.id))];
+        });
       }
     }
+  }, [pageProducts, page, hasActiveFilters, sortBy, initialProducts]);
 
-    const timer = setTimeout(() => {
-      fetchProducts(page);
-    }, 300);
-
-    return () => clearTimeout(timer);
-  }, [selectedCategories, selectedConditions, selectedStorage, minPrice, maxPrice, searchQuery, sortBy, page, hasActiveFilters, initialProducts]);
-
-  // Reset page when filters change
+  // Reset page on filter changes
   useEffect(() => {
     setPage(1);
+    setAllProducts([]);
   }, [selectedCategories, selectedConditions, selectedStorage, minPrice, maxPrice, searchQuery, sortBy]);
+
+  const hasMore =
+    (pageProducts?.length ?? (page === 1 ? initialProducts.length : 0)) >= PAGE_SIZE;
+
+  // ─── Infinite Scroll ──────────────────────────────────────────────────────
+  const observerTarget = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore && !isFetching) {
+          setPage((p) => p + 1);
+        }
+      },
+      { threshold: 0.1 }
+    );
+    if (observerTarget.current) observer.observe(observerTarget.current);
+    return () => observer.disconnect();
+  }, [hasMore, isFetching]);
+
+  // Lock scroll when mobile filters open
+  useEffect(() => {
+    document.body.style.overflow = showMobileFilters ? "hidden" : "unset";
+  }, [showMobileFilters]);
 
   const clearFilters = () => {
     setSelectedCategories([]);
@@ -208,14 +195,13 @@ export function ShopClient({ initialProducts }: ShopClientProps) {
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-3">
             <h2 className="text-xl font-bold text-navy-900">
-              {isLoading ? "Finding devices..." : `${products.length} Device${products.length !== 1 ? "s" : ""} Found`}
+              {isLoading ? "Finding devices..." : `${allProducts.length} Device${allProducts.length !== 1 ? "s" : ""} Found`}
             </h2>
-            {isLoading && <Loader2 className="w-5 h-5 text-brand-500 animate-spin" />}
+            {isFetching && <Loader2 className="w-5 h-5 text-brand-500 animate-spin" />}
           </div>
-          
-          {/* Active Filter Badges */}
+
           {hasActiveFilters && (
-            <button 
+            <button
               onClick={clearFilters}
               className="text-sm font-bold text-brand-600 hover:text-brand-700 underline underline-offset-4"
             >
@@ -225,18 +211,18 @@ export function ShopClient({ initialProducts }: ShopClientProps) {
         </div>
 
         {/* Product Grid */}
-        {products.length > 0 ? (
+        {allProducts.length > 0 ? (
           <>
-            <ProductGrid products={products} />
+            <ProductGrid products={allProducts} />
             {hasMore && (
-              <div className="flex justify-center mt-8">
+              <div ref={observerTarget} className="flex justify-center mt-8 py-4">
                 <button
                   onClick={() => setPage((p) => p + 1)}
-                  disabled={isLoadingMore}
+                  disabled={isFetching}
                   className="px-8 py-3 bg-navy-900 text-white rounded-xl font-bold hover:bg-navy-800 disabled:opacity-50 flex items-center gap-2"
                 >
-                  {isLoadingMore && <Loader2 className="w-4 h-4 animate-spin" />}
-                  {isLoadingMore ? "Loading..." : "Load More"}
+                  {isFetching && <Loader2 className="w-4 h-4 animate-spin" />}
+                  {isFetching ? "Loading more..." : "Load More"}
                 </button>
               </div>
             )}
@@ -246,9 +232,7 @@ export function ShopClient({ initialProducts }: ShopClientProps) {
             <div className="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
               <Search className="w-12 h-12 text-gray-300" />
             </div>
-            <h3 className="text-2xl font-bold text-navy-900 mb-3">
-              No matches found
-            </h3>
+            <h3 className="text-2xl font-bold text-navy-900 mb-3">No matches found</h3>
             <p className="text-gray-500 mb-8 max-w-sm mx-auto">
               We couldn&apos;t find any iPhones matching your current filters. Try broadening your search.
             </p>

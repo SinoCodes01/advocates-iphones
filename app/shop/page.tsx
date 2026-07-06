@@ -8,8 +8,8 @@ export const metadata = {
 };
 
 export default async function ShopPage() {
-  // Fetch initial products on the server for instant loading
-  const initialProducts = await getProducts();
+  // Fetch initial products on the server for instant loading (limit to 12 for pagination)
+  const initialProducts = await getProducts({ limit: 12 });
 
   return (
     <div className="min-h-screen bg-gray-50/50">

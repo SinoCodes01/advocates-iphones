@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase-admin";
 import { unstable_cache } from "next/cache";
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   try {
     const getPromotions = unstable_cache(

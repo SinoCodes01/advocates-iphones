@@ -1,34 +1,26 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { ArrowRight, Sparkles } from "lucide-react";
+import { queryKeys, fetchPromotions } from "@/lib/queries";
 
 export function SalePromoCarousel() {
-  const [promos, setPromos] = useState<any[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [direction, setDirection] = useState<"left" | "right">("right");
 
-  useEffect(() => {
-    const fetchPromos = async () => {
-      try {
-        const timestamp = new Date().getTime();
-        const res = await fetch(`/api/promotions?t=${timestamp}`, { cache: 'no-store' });
-        const data = await res.json();
-        if (data.success && data.promotions.length > 0) {
-          setPromos(data.promotions);
-        }
-      } catch (err) {
-        console.error("Failed to fetch promos", err);
-      }
-    };
-    fetchPromos();
-  }, []);
+  const { data: promos = [] } = useQuery({
+    queryKey: queryKeys.promotions,
+    queryFn: fetchPromotions,
+    // Auto-rotate carousel by refetching every 5 min in the background
+    refetchInterval: 5 * 60 * 1000,
+  });
 
-  useEffect(() => {
+  // Auto-advance carousel
+  useState(() => {
     if (isPaused || promos.length === 0) return;
-
     const interval = window.setInterval(() => {
       setActiveIndex((current) => {
         const nextIndex = (current + 1) % promos.length;
@@ -36,13 +28,12 @@ export function SalePromoCarousel() {
         return nextIndex;
       });
     }, 4200);
-
     return () => window.clearInterval(interval);
-  }, [isPaused, promos.length]);
+  });
 
   if (promos.length === 0) return null;
 
-  const currentPromo = promos[activeIndex];
+  const currentPromo = promos[activeIndex] ?? promos[0];
 
   return (
     <div
@@ -102,34 +93,15 @@ export function SalePromoCarousel() {
 
       <style jsx>{`
         @keyframes promo-enter-left {
-          from {
-            opacity: 0;
-            transform: translateX(-18px);
-          }
-          to {
-            opacity: 1;
-            transform: translateX(0);
-          }
+          from { opacity: 0; transform: translateX(-18px); }
+          to   { opacity: 1; transform: translateX(0); }
         }
-
         @keyframes promo-enter-right {
-          from {
-            opacity: 0;
-            transform: translateX(18px);
-          }
-          to {
-            opacity: 1;
-            transform: translateX(0);
-          }
+          from { opacity: 0; transform: translateX(18px); }
+          to   { opacity: 1; transform: translateX(0); }
         }
-
-        .animate-promo-enter-left {
-          animation: promo-enter-left 0.6s ease-out both;
-        }
-
-        .animate-promo-enter-right {
-          animation: promo-enter-right 0.6s ease-out both;
-        }
+        .animate-promo-enter-left  { animation: promo-enter-left  0.6s ease-out both; }
+        .animate-promo-enter-right { animation: promo-enter-right 0.6s ease-out both; }
       `}</style>
     </div>
   );

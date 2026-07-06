@@ -4,6 +4,7 @@ import { CartDrawer } from "@/components/layout/CartDrawer";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { ToastProvider } from "@/components/ui/Toast";
+import { QueryProvider } from "@/components/providers/QueryProvider";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.advocatesiphones.com"),
@@ -51,12 +52,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="min-h-screen flex flex-col">
-        <ToastProvider>
-          <Header />
-          <main className="flex-1">{children}</main>
-          <Footer />
-          <CartDrawer />
-        </ToastProvider>
+        <QueryProvider>
+          <ToastProvider>
+            <Header />
+            <main className="flex-1">{children}</main>
+            <Footer />
+            <CartDrawer />
+          </ToastProvider>
+        </QueryProvider>
       </body>
     </html>
   );

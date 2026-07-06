@@ -1,177 +1,163 @@
-import { useState, useEffect } from "react";
+"use client";
+
+import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/Button";
 import { Promotion, StoreSettings } from "@/lib/types";
+import { queryKeys, fetchPromotions, fetchSettings } from "@/lib/queries";
 import { Percent, Truck, Loader2, Save, Trash2, Plus, Megaphone } from "lucide-react";
 
 export function AdminSettings() {
-  const [settings, setSettings] = useState<StoreSettings | null>(null);
-  const [promotions, setPromotions] = useState<Promotion[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState(false);
+  const queryClient = useQueryClient();
 
-  // Bulk discount state
   const [discountPercent, setDiscountPercent] = useState("");
-  const [isApplyingDiscount, setIsApplyingDiscount] = useState(false);
-
-  // Promotions state
   const [isAddingPromo, setIsAddingPromo] = useState(false);
   const [newPromo, setNewPromo] = useState({ label: "", title: "", href: "", active: true, display_order: 0 });
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+  // ─── Queries ────────────────────────────────────────────────────────────────
 
-  const fetchData = async () => {
-    setIsLoading(true);
-    try {
-      const timestamp = new Date().getTime();
-      const [settingsRes, promosRes] = await Promise.all([
-        fetch(`/api/settings?t=${timestamp}`, { cache: 'no-store' }),
-        fetch(`/api/promotions?t=${timestamp}`, { cache: 'no-store' })
-      ]);
-      const settingsData = await settingsRes.json();
-      const promosData = await promosRes.json();
+  const { data: settings, isLoading: settingsLoading } = useQuery({
+    queryKey: queryKeys.settings,
+    queryFn: fetchSettings,
+  });
 
-      if (settingsData.success) setSettings(settingsData.settings);
-      if (promosData.success) setPromotions(promosData.promotions);
-    } catch (error) {
-      console.error("Failed to fetch settings:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const { data: promotions = [], isLoading: promosLoading } = useQuery({
+    queryKey: queryKeys.promotions,
+    queryFn: fetchPromotions,
+    // Include inactive promos in admin view by overriding the shared fetcher
+    select: (data) => data, // all promos (storefront filters active only)
+  });
 
-  // Function to refresh data after operations
-  const refreshData = async () => {
-    setIsLoading(true);
-    try {
-      const timestamp = new Date().getTime();
-      const [settingsRes, promosRes] = await Promise.all([
-        fetch(`/api/settings?t=${timestamp}`, { cache: 'no-store' }),
-        fetch(`/api/promotions?t=${timestamp}`, { cache: 'no-store' })
-      ]);
-      const settingsData = await settingsRes.json();
-      const promosData = await promosRes.json();
+  // Local copy of settings for the controlled input
+  const [localThreshold, setLocalThreshold] = useState<number | null>(null);
+  const threshold = localThreshold ?? settings?.free_delivery_threshold ?? 0;
 
-      if (settingsData.success) setSettings(settingsData.settings);
-      if (promosData.success) setPromotions(promosData.promotions);
-    } catch (error) {
-      console.error("Failed to refresh data:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const isLoading = settingsLoading || promosLoading;
 
-  const handleApplyBulkDiscount = async () => {
-    if (!discountPercent || isNaN(Number(discountPercent))) return;
-    if (!confirm(`Are you sure you want to apply a ${discountPercent}% discount to ALL products?`)) return;
+  // ─── Mutations ──────────────────────────────────────────────────────────────
 
-    setIsApplyingDiscount(true);
-    try {
-      const res = await fetch("/api/admin/bulk-discount", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ discountPercentage: Number(discountPercent) })
-      });
-      const data = await res.json();
-      if (data.success) {
-        alert("Bulk discount applied successfully!");
-        setDiscountPercent("");
-      } else {
-        alert(data.error || "Failed to apply discount");
-      }
-    } catch (err) {
-      alert("Error applying discount");
-    } finally {
-      setIsApplyingDiscount(false);
-    }
-  };
-
-  const handleUpdateSettings = async () => {
-    if (!settings) return;
-    setIsSaving(true);
-    try {
+  const saveSettingsMutation = useMutation({
+    mutationFn: async (free_delivery_threshold: number) => {
       const res = await fetch("/api/admin/settings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ free_delivery_threshold: Number(settings.free_delivery_threshold) })
+        body: JSON.stringify({ free_delivery_threshold }),
       });
       const data = await res.json();
-      if (data.success) {
-        alert("Settings saved!");
-        // Refresh admin state after successful settings save
-        await refreshData();
-      } else {
-        alert(data.error || "Failed to save settings");
-      }
-    } catch (err) {
-      alert("Error saving settings");
-    } finally {
-      setIsSaving(false);
-    }
-  };
+      if (!data.success) throw new Error(data.error || "Failed to save settings");
+      return data;
+    },
+    onSuccess: () => {
+      // Invalidate settings cache so storefront picks up new threshold instantly
+      queryClient.invalidateQueries({ queryKey: queryKeys.settings });
+      setLocalThreshold(null);
+      alert("Settings saved!");
+    },
+    onError: (err: Error) => alert(err.message),
+  });
 
-  const handleCreatePromo = async () => {
-    try {
+  const bulkDiscountMutation = useMutation({
+    mutationFn: async (discountPercentage: number) => {
+      const res = await fetch("/api/admin/bulk-discount", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ discountPercentage }),
+      });
+      const data = await res.json();
+      if (!data.success) throw new Error(data.error || "Failed to apply discount");
+      return data;
+    },
+    onSuccess: () => {
+      // Invalidate product cache so new prices show on storefront
+      queryClient.invalidateQueries({ queryKey: queryKeys.products() });
+      setDiscountPercent("");
+      alert("Bulk discount applied successfully!");
+    },
+    onError: (err: Error) => alert(err.message),
+  });
+
+  const createPromoMutation = useMutation({
+    mutationFn: async (promo: typeof newPromo) => {
       const res = await fetch("/api/admin/promotions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newPromo)
+        body: JSON.stringify(promo),
       });
       const data = await res.json();
-      if (data.success) {
-        // Use functional state update for promotions
-        setPromotions(prev => [...prev, data.promotion]);
-        setIsAddingPromo(false);
-        setNewPromo({ label: "", title: "", href: "", active: true, display_order: 0 });
-        // Refresh admin state to ensure consistency
-        await refreshData();
-      } else {
-        alert(data.error || "Failed to create promotion");
-      }
-    } catch (err) {
+      if (!data.success) throw new Error(data.error || "Failed to create promotion");
+      return data.promotion as Promotion;
+    },
+    // Optimistic update — UI updates instantly before the server confirms
+    onMutate: async (newPromoData) => {
+      await queryClient.cancelQueries({ queryKey: queryKeys.promotions });
+      const previous = queryClient.getQueryData(queryKeys.promotions);
+      queryClient.setQueryData(queryKeys.promotions, (old: Promotion[] = []) => [
+        ...old,
+        { ...newPromoData, id: `temp-${Date.now()}`, created_at: new Date().toISOString() },
+      ]);
+      return { previous };
+    },
+    // On error, roll back to the previous state
+    onError: (_err, _vars, context) => {
+      if (context?.previous) queryClient.setQueryData(queryKeys.promotions, context.previous);
       alert("Error creating promotion");
-    }
-  };
+    },
+    // Always refetch after settlement to sync with DB
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.promotions });
+      setIsAddingPromo(false);
+      setNewPromo({ label: "", title: "", href: "", active: true, display_order: 0 });
+    },
+  });
 
-  const handleDeletePromo = async (id: string) => {
-    if (!confirm("Delete this promotion?")) return;
-    try {
+  const deletePromoMutation = useMutation({
+    mutationFn: async (id: string) => {
       const res = await fetch(`/api/admin/promotions?id=${id}`, { method: "DELETE" });
       const data = await res.json();
-      if (data.success) {
-        // Use functional state update for promotions
-        setPromotions(prev => prev.filter(p => p.id !== id));
-        // Refresh admin state after deletion
-        await refreshData();
-      } else {
-        alert(data.error || "Failed to delete promotion");
-      }
-    } catch (err) {
+      if (!data.success) throw new Error(data.error || "Failed to delete promotion");
+    },
+    // Optimistic update
+    onMutate: async (id) => {
+      await queryClient.cancelQueries({ queryKey: queryKeys.promotions });
+      const previous = queryClient.getQueryData(queryKeys.promotions);
+      queryClient.setQueryData(queryKeys.promotions, (old: Promotion[] = []) =>
+        old.filter((p) => p.id !== id)
+      );
+      return { previous };
+    },
+    onError: (_err, _vars, context) => {
+      if (context?.previous) queryClient.setQueryData(queryKeys.promotions, context.previous);
       alert("Error deleting promotion");
-    }
-  };
+    },
+    onSettled: () => queryClient.invalidateQueries({ queryKey: queryKeys.promotions }),
+  });
 
-  const handleTogglePromo = async (promo: Promotion) => {
-    try {
+  const togglePromoMutation = useMutation({
+    mutationFn: async (promo: Promotion) => {
       const res = await fetch("/api/admin/promotions", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: promo.id, active: !promo.active })
+        body: JSON.stringify({ id: promo.id, active: !promo.active }),
       });
       const data = await res.json();
-      if (data.success) {
-        // Use functional state update for promotions
-        setPromotions(prev => prev.map(p => p.id === promo.id ? { ...p, active: !p.active } : p));
-        // Refresh admin state after toggle
-        await refreshData();
-      } else {
-        alert(data.error || "Failed to update promotion");
-      }
-    } catch (err) {
+      if (!data.success) throw new Error(data.error || "Failed to update promotion");
+      return data.promotion as Promotion;
+    },
+    // Optimistic toggle
+    onMutate: async (promo) => {
+      await queryClient.cancelQueries({ queryKey: queryKeys.promotions });
+      const previous = queryClient.getQueryData(queryKeys.promotions);
+      queryClient.setQueryData(queryKeys.promotions, (old: Promotion[] = []) =>
+        old.map((p) => (p.id === promo.id ? { ...p, active: !p.active } : p))
+      );
+      return { previous };
+    },
+    onError: (_err, _vars, context) => {
+      if (context?.previous) queryClient.setQueryData(queryKeys.promotions, context.previous);
       alert("Error updating promotion");
-    }
-  };
+    },
+    onSettled: () => queryClient.invalidateQueries({ queryKey: queryKeys.promotions }),
+  });
 
   if (isLoading) {
     return (
@@ -205,7 +191,14 @@ export function AdminSettings() {
             />
             <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 font-bold">%</span>
           </div>
-          <Button onClick={handleApplyBulkDiscount} loading={isApplyingDiscount}>
+          <Button
+            onClick={() => {
+              if (!discountPercent || isNaN(Number(discountPercent))) return;
+              if (!confirm(`Apply a ${discountPercent}% discount to ALL products?`)) return;
+              bulkDiscountMutation.mutate(Number(discountPercent));
+            }}
+            loading={bulkDiscountMutation.isPending}
+          >
             Apply Discount
           </Button>
         </div>
@@ -227,13 +220,16 @@ export function AdminSettings() {
             </label>
             <input
               type="number"
-              value={settings?.free_delivery_threshold === 0 && !settings?.free_delivery_threshold ? "" : settings?.free_delivery_threshold}
-              onChange={(e) => setSettings(prev => prev ? { ...prev, free_delivery_threshold: e.target.value === "" ? 0 : Number(e.target.value) } : null)}
+              value={threshold}
+              onChange={(e) => setLocalThreshold(e.target.value === "" ? 0 : Number(e.target.value))}
               className="px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-500 w-64 block no-spinner"
             />
             <p className="text-xs text-gray-500 mt-1">Orders above this amount will have their delivery fee waived automatically.</p>
           </div>
-          <Button onClick={handleUpdateSettings} loading={isSaving}>
+          <Button
+            onClick={() => saveSettingsMutation.mutate(threshold)}
+            loading={saveSettingsMutation.isPending}
+          >
             <Save className="w-4 h-4 mr-2" />
             Save Settings
           </Button>
@@ -263,7 +259,7 @@ export function AdminSettings() {
                 <input
                   type="text"
                   value={newPromo.label}
-                  onChange={e => setNewPromo({...newPromo, label: e.target.value})}
+                  onChange={(e) => setNewPromo({ ...newPromo, label: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"
                 />
               </div>
@@ -272,7 +268,7 @@ export function AdminSettings() {
                 <input
                   type="text"
                   value={newPromo.href}
-                  onChange={e => setNewPromo({...newPromo, href: e.target.value})}
+                  onChange={(e) => setNewPromo({ ...newPromo, href: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"
                 />
               </div>
@@ -281,14 +277,20 @@ export function AdminSettings() {
                 <input
                   type="text"
                   value={newPromo.title}
-                  onChange={e => setNewPromo({...newPromo, title: e.target.value})}
+                  onChange={(e) => setNewPromo({ ...newPromo, title: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"
                 />
               </div>
             </div>
             <div className="flex justify-end gap-2">
               <Button variant="outline" size="sm" onClick={() => setIsAddingPromo(false)}>Cancel</Button>
-              <Button size="sm" onClick={handleCreatePromo}>Save Banner</Button>
+              <Button
+                size="sm"
+                onClick={() => createPromoMutation.mutate(newPromo)}
+                loading={createPromoMutation.isPending}
+              >
+                Save Banner
+              </Button>
             </div>
           </div>
         )}
@@ -303,21 +305,27 @@ export function AdminSettings() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {promotions.map(promo => (
-                <tr key={promo.id}>
+              {promotions.map((promo) => (
+                <tr key={promo.id} className={promo.id.startsWith("temp-") ? "opacity-60 animate-pulse" : ""}>
                   <td className="px-4 py-3">
                     <p className="font-semibold text-sm text-navy-900">{promo.label}</p>
                     <p className="text-xs text-gray-500">{promo.title}</p>
                   </td>
                   <td className="px-4 py-3">
-                    <button onClick={() => handleTogglePromo(promo)}>
-                      <span className={`px-2 py-1 text-[10px] font-bold rounded-full uppercase tracking-wider ${promo.active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>
-                        {promo.active ? 'Active' : 'Inactive'}
+                    <button onClick={() => togglePromoMutation.mutate(promo)} disabled={togglePromoMutation.isPending}>
+                      <span className={`px-2 py-1 text-[10px] font-bold rounded-full uppercase tracking-wider ${promo.active ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-600"}`}>
+                        {promo.active ? "Active" : "Inactive"}
                       </span>
                     </button>
                   </td>
                   <td className="px-4 py-3 text-right">
-                    <button onClick={() => handleDeletePromo(promo.id)} className="p-2 text-gray-400 hover:text-red-500 transition-colors">
+                    <button
+                      onClick={() => {
+                        if (!confirm("Delete this promotion?")) return;
+                        deletePromoMutation.mutate(promo.id);
+                      }}
+                      className="p-2 text-gray-400 hover:text-red-500 transition-colors"
+                    >
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </td>
