@@ -13,7 +13,10 @@ interface ShopClientProps {
 export function ShopClient({ initialProducts }: ShopClientProps) {
   const [products, setProducts] = useState<Product[]>(initialProducts);
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(initialProducts.length >= 12);
   
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedConditions, setSelectedConditions] = useState<string[]>([]);
@@ -48,8 +51,12 @@ export function ShopClient({ initialProducts }: ShopClientProps) {
       return;
     }
 
-    async function fetchProducts() {
-      setIsLoading(true);
+    async function fetchProducts(currentPage: number) {
+      if (currentPage === 1) {
+        setIsLoading(true);
+      } else {
+        setIsLoadingMore(true);
+      }
       try {
         const params = new URLSearchParams();
         
@@ -71,6 +78,10 @@ export function ShopClient({ initialProducts }: ShopClientProps) {
         if (searchQuery) {
           params.append("search", searchQuery);
         }
+        params.append("limit", "12");
+        if (currentPage > 1) {
+          params.append("offset", ((currentPage - 1) * 12).toString());
+        }
 
         const res = await fetch(`/api/products?${params.toString()}`);
         const data = await res.json();
@@ -81,21 +92,32 @@ export function ShopClient({ initialProducts }: ShopClientProps) {
           else if (sortBy === "price-high") sortedProducts.sort((a, b) => b.price - a.price);
           else if (sortBy === "featured") sortedProducts.sort((a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0));
           
-          setProducts(sortedProducts);
+          if (currentPage === 1) {
+            setProducts(sortedProducts);
+          } else {
+            setProducts(prev => [...prev, ...sortedProducts]);
+          }
+          setHasMore(data.products.length >= 12);
         }
       } catch (error) {
         console.error("Failed to fetch products:", error);
       } finally {
         setIsLoading(false);
+        setIsLoadingMore(false);
       }
     }
 
     const timer = setTimeout(() => {
-      fetchProducts();
+      fetchProducts(page);
     }, 300);
 
     return () => clearTimeout(timer);
-  }, [selectedCategories, selectedConditions, selectedStorage, minPrice, maxPrice, searchQuery, sortBy, hasActiveFilters, initialProducts]);
+  }, [selectedCategories, selectedConditions, selectedStorage, minPrice, maxPrice, searchQuery, sortBy, page, hasActiveFilters, initialProducts]);
+
+  // Reset page when filters change
+  useEffect(() => {
+    setPage(1);
+  }, [selectedCategories, selectedConditions, selectedStorage, minPrice, maxPrice, searchQuery, sortBy]);
 
   const clearFilters = () => {
     setSelectedCategories([]);
@@ -104,6 +126,7 @@ export function ShopClient({ initialProducts }: ShopClientProps) {
     setMinPrice("");
     setMaxPrice("");
     setSearchQuery("");
+    setPage(1);
   };
 
   const availableCategories = Array.from(
@@ -203,7 +226,21 @@ export function ShopClient({ initialProducts }: ShopClientProps) {
 
         {/* Product Grid */}
         {products.length > 0 ? (
-          <ProductGrid products={products} />
+          <>
+            <ProductGrid products={products} />
+            {hasMore && (
+              <div className="flex justify-center mt-8">
+                <button
+                  onClick={() => setPage((p) => p + 1)}
+                  disabled={isLoadingMore}
+                  className="px-8 py-3 bg-navy-900 text-white rounded-xl font-bold hover:bg-navy-800 disabled:opacity-50 flex items-center gap-2"
+                >
+                  {isLoadingMore && <Loader2 className="w-4 h-4 animate-spin" />}
+                  {isLoadingMore ? "Loading..." : "Load More"}
+                </button>
+              </div>
+            )}
+          </>
         ) : !isLoading && (
           <div className="bg-white rounded-3xl border border-gray-100 py-24 px-8 text-center">
             <div className="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">

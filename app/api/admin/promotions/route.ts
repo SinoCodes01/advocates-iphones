@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase-admin";
+import { revalidateTag } from "next/cache";
 
 export async function POST(request: Request) {
   try {
@@ -9,10 +10,11 @@ export async function POST(request: Request) {
     const { data, error } = await supabase
       .from("promotions")
       .insert(body)
-      .select()
+      .select("id, label, title, href, active, display_order, created_at")
       .single();
 
     if (error) throw error;
+    revalidateTag("promotions");
     return NextResponse.json({ success: true, promotion: data });
   } catch (error: any) {
     console.error("Promotion creation error:", error);
@@ -32,10 +34,11 @@ export async function PATCH(request: Request) {
       .from("promotions")
       .update(updates)
       .eq("id", id)
-      .select()
+      .select("id, label, title, href, active, display_order, created_at")
       .single();
 
     if (error) throw error;
+    revalidateTag("promotions");
     return NextResponse.json({ success: true, promotion: data });
   } catch (error: any) {
     console.error("Promotion update error:", error);
@@ -53,6 +56,7 @@ export async function DELETE(request: Request) {
 
     const { error } = await supabase.from("promotions").delete().eq("id", id);
     if (error) throw error;
+    revalidateTag("promotions");
     return NextResponse.json({ success: true });
   } catch (error: any) {
     console.error("Promotion deletion error:", error);

@@ -54,7 +54,7 @@ export const getProducts = (filters: {
       const supabase = createClient();
       let query = supabase
         .from("products")
-        .select("*")
+        .select("id, active, battery_health, category, color, color_hex, compare_at_price, condition, created_at, description, featured, images, name, price, slug, storage, stock_quantity, warranty_months")
         .eq("active", true)
         .order("created_at", { ascending: false });
 
@@ -122,7 +122,7 @@ export const getProductBySlug = (slug: string) => {
       const supabase = createClient();
       const { data, error } = await supabase
         .from("products")
-        .select("*")
+        .select("id, active, battery_health, category, color, color_hex, compare_at_price, condition, created_at, description, featured, images, name, price, slug, storage, stock_quantity, warranty_months")
         .eq("slug", slug)
         .eq("active", true)
         .single();

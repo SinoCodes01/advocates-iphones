@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase-admin";
+import { revalidateTag } from "next/cache";
 
 export async function POST(request: Request) {
   try {
@@ -15,6 +16,9 @@ export async function POST(request: Request) {
     });
 
     if (error) throw error;
+    
+    // Invalidate the products cache so the storefront instantly reflects the new prices
+    revalidateTag("products");
 
     return NextResponse.json({ success: true });
   } catch (error: any) {

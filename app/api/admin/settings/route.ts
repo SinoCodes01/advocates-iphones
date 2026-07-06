@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase-admin";
+import { revalidateTag } from "next/cache";
 
 export async function POST(request: Request) {
   try {
@@ -12,6 +13,7 @@ export async function POST(request: Request) {
 
     if (error) throw error;
 
+    revalidateTag("settings");
     // Return the complete saved settings object
     return NextResponse.json({ success: true, settings: { ...body } });
   } catch (error: any) {

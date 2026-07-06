@@ -16,10 +16,12 @@ export async function GET(request: Request) {
     const search = searchParams.get("search");
     const featured = searchParams.get("featured");
     const slug = searchParams.get("slug");
+    const limit = searchParams.get("limit");
+    const offset = searchParams.get("offset");
 
     let query = supabase
       .from("products")
-      .select("*")
+      .select("id, active, battery_health, category, color, color_hex, compare_at_price, condition, created_at, description, featured, images, name, price, slug, storage, stock_quantity, warranty_months")
       .order("created_at", { ascending: false });
 
     // Verify session for active filter
@@ -75,6 +77,16 @@ export async function GET(request: Request) {
       query = query.or(`name.ilike.%${search}%,description.ilike.%${search}%,storage.ilike.%${search}%,color.ilike.%${search}%`);
     }
 
+    if (limit) {
+      const limitNum = parseInt(limit, 10);
+      if (offset) {
+        const offsetNum = parseInt(offset, 10);
+        query = query.range(offsetNum, offsetNum + limitNum - 1);
+      } else {
+        query = query.limit(limitNum);
+      }
+    }
+
     const { data, error } = await query;
 
     if (error) throw error;
@@ -123,7 +135,7 @@ export async function POST(request: Request) {
     const { data, error } = await supabase
       .from("products")
       .insert(validation.data)
-      .select()
+      .select("id, active, battery_health, category, color, color_hex, compare_at_price, condition, created_at, description, featured, images, name, price, slug, storage, stock_quantity, warranty_months")
       .single();
 
     if (error) throw error;
@@ -167,7 +179,7 @@ export async function PATCH(request: Request) {
       .from("products")
       .update(validation.data)
       .eq("id", id)
-      .select()
+      .select("id, active, battery_health, category, color, color_hex, compare_at_price, condition, created_at, description, featured, images, name, price, slug, storage, stock_quantity, warranty_months")
       .single();
 
     if (error) throw error;

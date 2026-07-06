@@ -62,7 +62,7 @@ export async function POST(request: Request) {
         delivery_fee: deliveryFee,
         total,
       })
-      .select()
+      .select("id, created_at, customer_name, delivery_address, delivery_fee, email, notes, order_number, payment_method, phone, status, subtotal, total")
       .single();
 
     if (orderError) throw orderError;
@@ -131,7 +131,7 @@ export async function GET(request: Request) {
 
     let query = supabase
       .from("orders")
-      .select("*, order_items(*)")
+      .select("id, created_at, customer_name, delivery_address, delivery_fee, email, notes, order_number, payment_method, phone, status, subtotal, total, order_items(id, created_at, order_id, product_id, product_name, quantity, unit_price)")
       .order("created_at", { ascending: false });
 
     if (status) {
@@ -189,7 +189,7 @@ export async function PATCH(request: Request) {
     // Get the current order to see items if we need to release/confirm
     const { data: currentOrder, error: fetchError } = await supabase
       .from("orders")
-      .select("*, order_items(*)")
+      .select("id, created_at, customer_name, delivery_address, delivery_fee, email, notes, order_number, payment_method, phone, status, subtotal, total, order_items(id, created_at, order_id, product_id, product_name, quantity, unit_price)")
       .eq("id", id)
       .single();
 
@@ -199,7 +199,7 @@ export async function PATCH(request: Request) {
       .from("orders")
       .update({ status })
       .eq("id", id)
-      .select()
+      .select("id, created_at, customer_name, delivery_address, delivery_fee, email, notes, order_number, payment_method, phone, status, subtotal, total")
       .single();
 
     if (error) throw error;
