@@ -4,32 +4,27 @@ import { X, Plus, Minus, ShoppingBag, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useCartStore } from "@/store/cart";
 import { formatPrice, cn } from "@/lib/utils";
+import { queryKeys, fetchSettings } from "@/lib/queries";
 
 export function CartDrawer() {
   const [mounted, setMounted] = useState(false);
-  const [freeDeliveryThreshold, setFreeDeliveryThreshold] = useState<number | null>(null);
   const { items, isOpen, closeCart, updateQuantity, removeItem, getSubtotal } =
     useCartStore();
 
+  // Shares the same cache as AdminSettings — updates instantly when admin changes threshold
+  const { data: settingsData } = useQuery({
+    queryKey: queryKeys.settings,
+    queryFn: fetchSettings,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const freeDeliveryThreshold = settingsData?.free_delivery_threshold ?? null;
+
   useEffect(() => {
     setMounted(true);
-    
-    // Fetch free delivery threshold
-    const fetchSettings = async () => {
-      try {
-        const timestamp = new Date().getTime();
-        const res = await fetch(`/api/settings?t=${timestamp}`, { cache: 'no-store' });
-        const data = await res.json();
-        if (data.success && data.settings) {
-          setFreeDeliveryThreshold(data.settings.free_delivery_threshold);
-        }
-      } catch (error) {
-        console.error("Failed to fetch settings:", error);
-      }
-    };
-    fetchSettings();
   }, []);
 
   if (!mounted) return null;
