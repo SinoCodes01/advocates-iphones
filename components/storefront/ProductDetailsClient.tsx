@@ -210,7 +210,7 @@ export function ProductDetailsClient({ product }: ProductDetailsClientProps) {
             <Truck className="w-5 h-5 text-brand-500" />
             <div>
               <p className="font-medium text-gray-900">Nationwide Delivery</p>
-              <p className="text-sm text-gray-500">2-5 business days</p>
+              <p className="text-sm text-gray-500">6-12 working days</p>
             </div>
           </div>
           <div className="flex items-center gap-3">

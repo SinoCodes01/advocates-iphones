@@ -23,6 +23,13 @@ export default function DeliveryPage() {
             <p className="text-sm text-gray-600">3-5 business days. Delivery fee: R200.</p>
           </div>
         </div>
+        <div className="mt-6 p-4 bg-blue-50 border border-blue-100 rounded-xl">
+          <p className="text-sm text-blue-800">
+            <strong>General Delivery Notice:</strong> Our standard delivery wait time is 6-12 working days
+            across all regions. This includes quality inspections and careful packaging.
+            
+          </p>
+        </div>
       </section>
 
       <section className="mb-10">

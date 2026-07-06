@@ -372,6 +372,16 @@ export default function CheckoutPage() {
                       </div>
                     </div>
 
+                    {/* Delivery wait time notice */}
+                    <div className="p-4 bg-blue-50 border border-blue-100 rounded-xl">
+                      <p className="text-sm text-blue-800">
+                        <strong>Delivery Timeline Notice:</strong> Standard delivery takes 6-12 working days
+                        to process throughout all regions. This includes comprehensive quality inspections
+                        and eco-conscious packaging preparation to ensure your iPhone arrives safely.
+                        
+                      </p>
+                    </div>
+
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Payment Method *
