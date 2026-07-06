@@ -26,6 +26,8 @@ export function ShopClient({ initialProducts }: ShopClientProps) {
   const [maxPrice, setMaxPrice] = useState("");
   const [sortBy, setSortBy] = useState("featured");
   const [showMobileFilters, setShowMobileFilters] = useState(false);
+  // Track whether filters have changed to trigger a reset
+  const [filterVersion, setFilterVersion] = useState(0);
 
   const hasActiveFilters =
     selectedCategories.length > 0 ||
@@ -77,11 +79,20 @@ export function ShopClient({ initialProducts }: ShopClientProps) {
     }
   }, [pageProducts, page, hasActiveFilters, sortBy, initialProducts]);
 
-  // Reset page on filter changes
+  // Reset page on filter changes (but NOT on mount)
   useEffect(() => {
+    if (filterVersion === 0) return; // skip the initial mount
     setPage(1);
     setAllProducts([]);
-  }, [selectedCategories, selectedConditions, selectedStorage, minPrice, maxPrice, searchQuery, sortBy]);
+  }, [filterVersion]);
+
+  const handleCategoryChange = (val: string[]) => { setSelectedCategories(val); setFilterVersion(v => v + 1); };
+  const handleConditionChange = (val: string[]) => { setSelectedConditions(val); setFilterVersion(v => v + 1); };
+  const handleStorageChange = (val: string[]) => { setSelectedStorage(val); setFilterVersion(v => v + 1); };
+  const handleMinPriceChange = (val: string) => { setMinPrice(val); setFilterVersion(v => v + 1); };
+  const handleMaxPriceChange = (val: string) => { setMaxPrice(val); setFilterVersion(v => v + 1); };
+  const handleSearchChange = (val: string) => { setSearchQuery(val); setFilterVersion(v => v + 1); };
+  const handleSortChange = (val: string) => { setSortBy(val); setFilterVersion(v => v + 1); };
 
   const hasMore =
     (pageProducts?.length ?? (page === 1 ? initialProducts.length : 0)) >= PAGE_SIZE;
@@ -114,6 +125,7 @@ export function ShopClient({ initialProducts }: ShopClientProps) {
     setMaxPrice("");
     setSearchQuery("");
     setPage(1);
+    setAllProducts(initialProducts);
   };
 
   const availableCategories = Array.from(
@@ -127,15 +139,15 @@ export function ShopClient({ initialProducts }: ShopClientProps) {
         <div className="sticky top-24">
           <FilterSidebar
             selectedCategories={selectedCategories}
-            setSelectedCategories={setSelectedCategories}
+            setSelectedCategories={handleCategoryChange}
             selectedConditions={selectedConditions}
-            setSelectedConditions={setSelectedConditions}
+            setSelectedConditions={handleConditionChange}
             selectedStorage={selectedStorage}
-            setSelectedStorage={setSelectedStorage}
+            setSelectedStorage={handleStorageChange}
             minPrice={minPrice}
-            setMinPrice={setMinPrice}
+            setMinPrice={handleMinPriceChange}
             maxPrice={maxPrice}
-            setMaxPrice={setMaxPrice}
+            setMaxPrice={handleMaxPriceChange}
             onClear={clearFilters}
             availableCategories={availableCategories}
           />
@@ -154,12 +166,12 @@ export function ShopClient({ initialProducts }: ShopClientProps) {
                 type="text"
                 placeholder="Search by model, color, or storage..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e) => handleSearchChange(e.target.value)}
                 className="w-full pl-12 pr-12 py-3.5 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-brand-500 transition-all text-navy-900 placeholder:text-gray-400"
               />
               {searchQuery && (
                 <button
-                  onClick={() => setSearchQuery("")}
+                  onClick={() => handleSearchChange("")}
                   className="absolute right-4 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-200 rounded-full transition-colors"
                 >
                   <X className="w-4 h-4 text-gray-500" />
@@ -180,7 +192,7 @@ export function ShopClient({ initialProducts }: ShopClientProps) {
               {/* Sort Dropdown */}
               <select
                 value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
+                onChange={(e) => handleSortChange(e.target.value)}
                 className="px-5 py-3.5 bg-white border border-gray-200 rounded-xl font-bold text-navy-900 focus:ring-2 focus:ring-brand-500 outline-none cursor-pointer hover:bg-gray-50 transition-colors appearance-none min-w-[160px]"
               >
                 <option value="featured">Featured</option>
@@ -253,15 +265,15 @@ export function ShopClient({ initialProducts }: ShopClientProps) {
           <div className="absolute inset-y-0 right-0 w-full max-w-xs bg-white shadow-2xl animate-in slide-in-from-right duration-300">
             <FilterSidebar
               selectedCategories={selectedCategories}
-              setSelectedCategories={setSelectedCategories}
+              setSelectedCategories={handleCategoryChange}
               selectedConditions={selectedConditions}
-              setSelectedConditions={setSelectedConditions}
+              setSelectedConditions={handleConditionChange}
               selectedStorage={selectedStorage}
-              setSelectedStorage={setSelectedStorage}
+              setSelectedStorage={handleStorageChange}
               minPrice={minPrice}
-              setMinPrice={setMinPrice}
+              setMinPrice={handleMinPriceChange}
               maxPrice={maxPrice}
-              setMaxPrice={setMaxPrice}
+              setMaxPrice={handleMaxPriceChange}
               onClear={clearFilters}
               onClose={() => setShowMobileFilters(false)}
               availableCategories={availableCategories}

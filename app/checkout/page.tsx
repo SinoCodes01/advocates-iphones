@@ -100,7 +100,12 @@ export default function CheckoutPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          ...formData,
+          customerName: formData.customerName,
+          phone: formData.phone,
+          email: formData.email,
+          deliveryAddress: formData.deliveryAddress,
+          paymentMethod: formData.paymentMethod,
+          notes: formData.notes,
           items,
           subtotal,
           deliveryFee,
